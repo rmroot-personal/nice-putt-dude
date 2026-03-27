@@ -1,0 +1,16 @@
+.npd-toolbar {
+	position: sticky;
+	top: 0;
+	z-index: 100;
+	width: 100%;
+	min-height: 56px;
+	display: flex;
+	align-items: center;
+	box-shadow: 0 2px 4px rgba(0,0,0,0.04);
+}
+
+.npd-title {
+	font-size: 1.5rem;
+	font-weight: 600;
+	letter-spacing: 1px;
+}
