@@ -1,0 +1,7 @@
+@if (loading()) {
+	<p>Loading match...</p>
+} @else if (error()) {
+	<p>{{ error() }}</p>
+} @else if (match()) {
+	<h2>{{ match()?.name }}</h2>
+}

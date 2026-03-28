@@ -1,0 +1,15 @@
+<form (ngSubmit)="onSubmit()" [formGroup]="form">
+    <mat-form-field appearance="outline" class="npd-form-field">
+        <mat-label>Name</mat-label>
+        <input matInput formControlName="name" maxlength="50" required />
+        @if (name.hasError('required')) {
+        <mat-error>Name is required</mat-error>
+        }
+        @if (name.hasError('maxLength')) {
+        <mat-error>Name is too long</mat-error>
+        }
+    </mat-form-field>
+    <div class="npd-form-actions">
+        <button mat-raised-button color="primary" type="submit" [disabled]="name.invalid">Create Match</button>
+    </div>
+</form>

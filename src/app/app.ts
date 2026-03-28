@@ -1,6 +1,8 @@
-import { Component } from '@angular/core';
-import { RouterOutlet } from '@angular/router';
+
+import { Component, inject, effect } from '@angular/core';
+import { Router, RouterOutlet } from '@angular/router';
 import { Banner } from "./components/banner/banner";
+import { UserService } from './services/user.service';
 
 @Component({
   selector: 'app-root',
@@ -9,5 +11,14 @@ import { Banner } from "./components/banner/banner";
   styleUrl: './app.css'
 })
 export class App {
+  private readonly userService = inject(UserService);
+  private readonly router = inject(Router);
 
+  constructor() {
+    effect(() => {
+      if (!this.userService.user()) {
+        this.router.navigateByUrl('/');
+      }
+    });
+  }
 }

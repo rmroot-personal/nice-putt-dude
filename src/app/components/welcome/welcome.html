@@ -19,8 +19,8 @@
 					<button mat-raised-button color="primary" (click)="login()">Sign in with Google</button>
 				}
 				@if (user()) {
-					<button mat-raised-button color="primary">Start New Game</button>
-					<button mat-stroked-button color="accent">Join Game</button>
+					<button mat-raised-button color="primary" [routerLink]="'new-match'">Start New Match</button>
+					<button mat-stroked-button color="accent">Join Match</button>
 				}
 			</div>
 		</mat-card-content>

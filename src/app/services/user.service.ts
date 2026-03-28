@@ -1,17 +1,17 @@
 import { Injectable, signal, computed, inject } from '@angular/core';
 import { Auth, authState, signInWithPopup, GoogleAuthProvider, signOut, User as FirebaseUser } from '@angular/fire/auth';
 import { Observable } from 'rxjs';
-import { User } from '../models/user.model';
+import { IUser } from '../models/user.model';
 
 @Injectable({ providedIn: 'root' })
 export class UserService {
   private readonly auth = inject(Auth);
-  private readonly _user = signal<User | null>(null);
+  private readonly _user = signal<IUser | null>(null);
 
   constructor() {
     authState(this.auth).subscribe(firebaseUser => {
       if (firebaseUser) {
-        const user: User = {
+        const user: IUser = {
           uid: firebaseUser.uid,
           displayName: firebaseUser.displayName ?? null,
           email: firebaseUser.email ?? null,

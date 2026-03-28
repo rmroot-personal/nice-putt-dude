@@ -3,13 +3,15 @@ import { Component, computed, inject } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { UserService } from '../../services/user.service';
+import { RouterLink } from "@angular/router";
 
 @Component({
   selector: 'app-welcome',
   imports: [
     MatCardModule,
-    MatButtonModule
-  ],
+    MatButtonModule,
+    RouterLink
+],
   templateUrl: './welcome.html',
   styleUrl: './welcome.css',
 })
