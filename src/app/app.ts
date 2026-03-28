@@ -16,7 +16,7 @@ export class App {
 
   constructor() {
     effect(() => {
-      if (!this.userService.user()) {
+      if (!this.userService.user() && this.router.url.includes('manage-profile') == false) {
         this.router.navigateByUrl('/');
       }
     });

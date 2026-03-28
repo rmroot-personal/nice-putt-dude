@@ -3,10 +3,10 @@
 		<mat-card-header>
 			<mat-card-title>
 				@if (user()) {
-					Hello {{ user()?.displayName || 'user' }}, Welcome to Nice Putt Dude!
+				Hello {{ user()?.displayName || 'user' }}, Welcome to Nice Putt Dude!
 				}
 				@else {
-					Welcome to Nice Putt Dude!
+				Welcome to Nice Putt Dude!
 				}
 			</mat-card-title>
 		</mat-card-header>
@@ -16,11 +16,12 @@
 			</p>
 			<div class="npd-welcome-actions">
 				@if (!user()) {
-					<button mat-raised-button color="primary" (click)="login()">Sign in with Google</button>
+				<button mat-raised-button color="primary" [routerLink]="'create-account'">Create Account</button>
+				<button mat-raised-button color="primary" (click)="login()">Sign in with Google</button>
 				}
 				@if (user()) {
-					<button mat-raised-button color="primary" [routerLink]="'new-match'">Start New Match</button>
-					<button mat-stroked-button color="accent" [routerLink]="'my-matches'">My Matches</button>
+				<button mat-raised-button color="primary" [routerLink]="'new-match'">Start New Match</button>
+				<button mat-stroked-button color="accent" [routerLink]="'my-matches'">My Matches</button>
 				}
 			</div>
 		</mat-card-content>

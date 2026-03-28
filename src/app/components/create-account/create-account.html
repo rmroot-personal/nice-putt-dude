@@ -1,0 +1,27 @@
+<form [formGroup]="form" (ngSubmit)="onSubmit()" class="npd-create-account-form">
+	<mat-form-field appearance="outline" class="npd-form-field">
+		<mat-label>Email</mat-label>
+		<input matInput formControlName="email" type="email" required autocomplete="email" />
+		@if (email.hasError('required')) {
+			<mat-error>Email is required</mat-error>
+		}
+		@if (email.hasError('email')) {
+			<mat-error>Enter a valid email</mat-error>
+		}
+	</mat-form-field>
+
+	<mat-form-field appearance="outline" class="npd-form-field">
+		<mat-label>Password</mat-label>
+		<input matInput formControlName="password" type="password" required autocomplete="new-password" />
+		@if (password.hasError('required')) {
+			<mat-error>Password is required</mat-error>
+		}
+		@if (password.hasError('minlength')) {
+			<mat-error>Password must be at least 6 characters</mat-error>
+		}
+	</mat-form-field>
+
+	<div class="npd-form-actions">
+		<button mat-raised-button color="primary" type="submit" [disabled]="form.invalid">Create Account</button>
+	</div>
+</form>

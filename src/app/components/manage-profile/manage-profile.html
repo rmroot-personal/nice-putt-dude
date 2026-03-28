@@ -1,0 +1,16 @@
+<h2>Manage Profile</h2>
+<form [formGroup]="form" (ngSubmit)="onSubmit()" class="npd-manage-profile-form">
+	<mat-form-field appearance="outline" class="npd-form-field">
+		<mat-label>Display Name</mat-label>
+		<input matInput formControlName="displayName" maxlength="50" required autocomplete="name" />
+		@if (displayName.hasError('required')) {
+			<mat-error>Display name is required</mat-error>
+		}
+		@if (displayName.hasError('maxLength')) {
+			<mat-error>Display name is too long</mat-error>
+		}
+	</mat-form-field>
+	<div class="npd-form-actions">
+		<button mat-raised-button color="primary" type="submit" [disabled]="form.invalid">Update Profile</button>
+	</div>
+</form>

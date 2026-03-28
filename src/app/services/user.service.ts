@@ -1,5 +1,5 @@
 import { Injectable, signal, computed, inject } from '@angular/core';
-import { Auth, authState, signInWithPopup, GoogleAuthProvider, signOut, User as FirebaseUser } from '@angular/fire/auth';
+import { Auth, authState, signInWithPopup, GoogleAuthProvider, signOut, User as FirebaseUser, createUserWithEmailAndPassword, updateProfile } from '@angular/fire/auth';
 import { Observable } from 'rxjs';
 import { IUser } from '../models/user.model';
 
@@ -33,5 +33,32 @@ export class UserService {
 
   async signOut(): Promise<void> {
     await signOut(this.auth);
+  }
+
+  /**
+ * Create a new user account with email and password.
+ * @param email The user's email address
+ * @param password The user's password
+ */
+  async createAccountWithEmail(email: string, password: string): Promise<void> {
+    await createUserWithEmailAndPassword(this.auth, email, password);
+  }
+
+  //implement updateProfile
+  async updateProfile(displayName: string | null, photoURL: string | null): Promise<void> {
+    if (!this.auth.currentUser) {
+      throw new Error('No user is currently signed in');
+    }
+    await updateProfile(this.auth.currentUser, { displayName: displayName, photoURL: photoURL });
+    if (this.auth.currentUser) {
+      const user: IUser = {
+        uid: this.auth.currentUser.uid,
+        displayName: this.auth.currentUser.displayName ?? null,
+        email: this.auth.currentUser.email ?? null,
+        photoURL: this.auth.currentUser.photoURL ?? null,
+        emailVerified: this.auth.currentUser.emailVerified,
+      };
+      this._user.set(user);
+    }
   }
 }
