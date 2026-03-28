@@ -39,6 +39,9 @@ testem.log
 /typings
 __screenshots__/
 
+# Firebase environment (do not commit secrets)
+src/environments/firebase.ts
+
 # System files
 .DS_Store
 Thumbs.db

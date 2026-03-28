@@ -1,6 +1,6 @@
-import { Component, signal } from '@angular/core';
+import { Component } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
-import { Banner } from "./banner/banner";
+import { Banner } from "./components/banner/banner";
 
 @Component({
   selector: 'app-root',
@@ -9,5 +9,5 @@ import { Banner } from "./banner/banner";
   styleUrl: './app.css'
 })
 export class App {
-  protected readonly title = signal('nice-putt-dude');
+
 }

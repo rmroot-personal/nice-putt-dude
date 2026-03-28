@@ -1,0 +1,28 @@
+<div class="npd-welcome-container">
+	<mat-card class="npd-welcome-card">
+		<mat-card-header>
+			<mat-card-title>
+				@if (user()) {
+					Hello {{ user()?.displayName || 'user' }}, Welcome to Nice Putt Dude!
+				}
+				@else {
+					Welcome to Nice Putt Dude!
+				}
+			</mat-card-title>
+		</mat-card-header>
+		<mat-card-content>
+			<p>
+				Keep golf scores with friends, track your rounds, and enjoy a modern, mobile-friendly experience.
+			</p>
+			<div class="npd-welcome-actions">
+				@if (!user()) {
+					<button mat-raised-button color="primary" (click)="login()">Sign in with Google</button>
+				}
+				@if (user()) {
+					<button mat-raised-button color="primary">Start New Game</button>
+					<button mat-stroked-button color="accent">Join Game</button>
+				}
+			</div>
+		</mat-card-content>
+	</mat-card>
+</div>
