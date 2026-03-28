@@ -2,6 +2,7 @@ import { Routes } from '@angular/router';
 import { Welcome } from './components/welcome/welcome';
 import { NewMatch } from './components/new-match/new-match';
 import { PlayMatch } from './components/play-match/play-match';
+import { MyMatches } from './components/my-matches/my-matches';
 
 export const routes: Routes = [
     {
@@ -15,5 +16,9 @@ export const routes: Routes = [
     {
         path: 'play-match/:id',
         component: PlayMatch
+    },
+    {
+        path: 'my-matches',
+        component: MyMatches
     }
 ];
