@@ -1,0 +1,13 @@
+<div class="npd-scorecard-container">
+	@if (loading()) {
+		<p>Loading scorecard...</p>
+	} @else if (error()) {
+		<p>{{ error() }}</p>
+	} @else if (scorecard()) {
+		<a [routerLink]="['/play-match', scorecard()?.matchId]" class="npd-back-link">
+			&larr; Back to Match
+		</a>
+		<h2>Scorecard: {{ scorecard()?.id }}</h2>
+		<!-- Add more scorecard details here -->
+	}
+</div>

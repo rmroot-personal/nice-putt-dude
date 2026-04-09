@@ -3,4 +3,6 @@ export interface IMatch {
     name: string;
     createdByUserId: string;
     createdAt: string;
+    players: Array<string>;
+    golfCourseId: string;
 }

@@ -1,9 +1,10 @@
 import { Injectable, inject } from '@angular/core';
-import { Firestore, collection, addDoc, CollectionReference, DocumentData, doc, getDoc, query, where, getDocs } from '@angular/fire/firestore';
+import { Firestore, collection, addDoc, doc, getDoc, query, where, getDocs } from '@angular/fire/firestore';
 
 
 import { IMatch } from '../models/match.model';
 import { UserService } from './user.service';
+import { deleteDoc } from 'firebase/firestore';
 
 @Injectable({ providedIn: 'root' })
 export class MatchesFirestoreService {
@@ -19,7 +20,8 @@ export class MatchesFirestoreService {
       name,
       golfCourseId,
       createdByUserId: user.uid,
-      createdAt: new Date().toISOString()
+      createdAt: new Date().toISOString(),
+      players: []
     });
     return docRef.id;
   }
@@ -30,7 +32,7 @@ export class MatchesFirestoreService {
     const snap = await getDoc(docRef);
     if (!snap.exists()) return null;
     const data = snap.data() as IMatch;
-    return { id: snap.id, name: data.name, createdByUserId: data.createdByUserId, createdAt: data.createdAt };
+    return { ...data, id: snap.id };
   }
 
   async getMatchesForCurrentUser(): Promise<IMatch[]> {
@@ -41,7 +43,12 @@ export class MatchesFirestoreService {
     const snap = await getDocs(q);
     return snap.docs.map(docSnap => {
       const data = docSnap.data() as IMatch;
-      return { id: docSnap.id, name: data.name, createdByUserId: data.createdByUserId, createdAt: data.createdAt };
+      return { ...data, id: docSnap.id };
     });
+  }
+
+  async deleteMatch(matchId: string): Promise<void> {
+    const matchRef = doc(this.firestore, 'matches', matchId);
+    await deleteDoc(matchRef);
   }
 }
