@@ -1,6 +1,7 @@
 import { Injectable, inject } from '@angular/core';
-import { Firestore, collection, getDocs, query, where } from '@angular/fire/firestore';
+import { Firestore, collection, collectionData, getDocs, query, where } from '@angular/fire/firestore';
 import { IPublicUser } from '../models/public-users.model';
+import { Observable } from 'rxjs';
 
 @Injectable({ providedIn: 'root' })
 export class PublicUsersFirestoreService {
@@ -24,5 +25,10 @@ export class PublicUsersFirestoreService {
             const data = docSnap.data() as IPublicUser;
             return { userId: data.userId, displayName: data.displayName };
         });
+    }
+
+    publicUsers$(): Observable<IPublicUser[]> {
+        // Use collectionData for real-time updates
+        return collectionData(collection(this.firestore, 'publicUsers')) as Observable<IPublicUser[]>;
     }
 }

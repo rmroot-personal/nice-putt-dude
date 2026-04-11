@@ -8,10 +8,11 @@ import { MatCardModule } from '@angular/material/card';
 import { MatListModule } from '@angular/material/list';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatError } from '@angular/material/form-field';
+import { MatIcon } from '@angular/material/icon';
 
 @Component({
   selector: 'app-my-matches',
-  imports: [RouterLink, MatCardModule, MatListModule, MatProgressSpinnerModule, MatError],
+  imports: [RouterLink, MatCardModule, MatListModule, MatProgressSpinnerModule, MatError, MatIcon],
   templateUrl: './my-matches.html',
   styleUrl: './my-matches.css',
 })

@@ -2,7 +2,7 @@
 	display: flex;
 	flex-direction: column;
 	align-items: center;
-	justify-content: center;
+	/* justify-content: center; */
 	min-height: 70vh;
 	width: 100%;
 }
@@ -10,9 +10,7 @@
 .npd-welcome-card {
 	max-width: 400px;
 	width: 100%;
-	margin: 24px auto;
 	padding: 8px 0 16px 0;
-	border-radius: 16px;
 }
 
 .npd-welcome-actions {
@@ -25,10 +23,12 @@
 @media (min-width: 600px) {
 	.npd-welcome-card {
 		max-width: 480px;
+		margin: 24px auto;
 	}
+
 	.npd-welcome-actions {
-		flex-direction: row;
+		/* flex-direction: row; */
 		justify-content: center;
-		gap: 24px;
+		/* gap: 24px; */
 	}
 }

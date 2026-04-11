@@ -1,10 +1,11 @@
 import { Injectable, inject } from '@angular/core';
-import { Firestore, collection, addDoc, doc, getDoc, query, where, getDocs } from '@angular/fire/firestore';
+import { Firestore, collection, addDoc, doc, getDoc, query, where, getDocs, docData } from '@angular/fire/firestore';
 
 
 import { IMatch } from '../models/match.model';
 import { UserService } from './user.service';
 import { deleteDoc } from 'firebase/firestore';
+import { Observable } from 'rxjs';
 
 @Injectable({ providedIn: 'root' })
 export class MatchesFirestoreService {
@@ -50,5 +51,15 @@ export class MatchesFirestoreService {
   async deleteMatch(matchId: string): Promise<void> {
     const matchRef = doc(this.firestore, 'matches', matchId);
     await deleteDoc(matchRef);
+  }
+
+
+
+  /**
+  * Returns a real-time observable of a match for a given matchId.
+  */
+  match$(matchId: string): Observable<IMatch> {
+    const matchRef = doc(this.firestore, 'matches', matchId);
+    return docData(matchRef, { idField: 'id' }) as Observable<IMatch>;
   }
 }

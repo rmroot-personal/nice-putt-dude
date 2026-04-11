@@ -1,8 +1,11 @@
 import { Injectable, inject } from '@angular/core';
 import { Firestore, collection, addDoc, doc, getDoc, getDocs } from '@angular/fire/firestore';
+import { collectionData } from '@angular/fire/firestore';
 import { UserService } from './user.service';
 import { IScorecard } from '../models/scorecard.model';
 import { query, where } from 'firebase/firestore';
+import { Observable } from 'rxjs';
+
 
 @Injectable({ providedIn: 'root' })
 export class ScorecardFirestoreService {
@@ -46,5 +49,15 @@ export class ScorecardFirestoreService {
             const data = docSnap.data() as IScorecard;
             return { ...data, id: docSnap.id };
         });
+    }
+
+    /**
+    * Returns a real-time observable of scorecards for a given matchId.
+    */
+    scorecardsForMatch$(matchId: string): Observable<IScorecard[]> {
+        const scorecardsRef = collection(this.firestore, 'scorecards');
+        const q = query(scorecardsRef, where('matchId', '==', matchId));
+        // idField ensures the id is included in the returned objects
+        return collectionData(q, { idField: 'id' }) as Observable<IScorecard[]>;
     }
 }

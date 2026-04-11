@@ -1,73 +1,61 @@
 mat-card-header {
-	display: flex;
-	align-items: center;
+    display: flex;
+    align-items: center;
 }
 
 mat-card-title {
-	display: flex;
-	align-items: center;
-	gap: 0.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
 }
 
 mat-card-title mat-icon {
-	font-size: 28px;
-	height: 28px;
-	width: 28px;
-	vertical-align: middle;
-	margin-right: 0.5rem;
+    font-size: 28px;
+    height: 28px;
+    width: 28px;
+    vertical-align: middle;
+    margin-right: 0.5rem;
 }
 
 h3[matSubheader] {
-	display: flex;
-	align-items: center;
-	gap: 0.5rem;
-	/* margin-bottom: 0.5rem; */
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    /* margin-bottom: 0.5rem; */
     /* vertical-align: middle; */
 }
 
 h3[matSubheader] mat-icon {
-	font-size: 22px;
-	height: 22px;
-	width: 22px;
-	vertical-align: middle;
+    font-size: 22px;
+    height: 22px;
+    width: 22px;
+    vertical-align: middle;
 }
+
 /* Vertically center the chevron icon in the meta container */
 [matListItemMeta] {
-	display: flex;
-	align-items: center;
-	height: 100%;
+    display: flex;
+    align-items: center;
+    height: 100%;
 }
 
 [matListItemMeta] mat-icon {
-	font-size: 24px;
-	height: 24px;
-	width: 24px;
-	line-height: 1;
-	vertical-align: middle;
-	margin-left: 4px;
+    font-size: 24px;
+    height: 24px;
+    width: 24px;
+    line-height: 1;
+    vertical-align: middle;
+    margin-left: 4px;
 }
 
 
-[mat-list-item]{
+mat-list-item {
+     background-color: tomato;
 
-    background-color: tomato;
 
 }
 
-
-.npd-play-match-container {
-	display: flex;
-	flex-direction: column;
-	align-items: center;
-	/* justify-content: center; */
-	min-height: 70vh;
-	width: 100%;
-}
-
-.npd-match-card {
-	max-width: 400px;
-	width: 100%;
-	margin: 24px auto;
-	padding: 8px 0 16px 0;
-	border-radius: 16px;
+mat-card-header a{
+    margin-left: auto;
+    
 }

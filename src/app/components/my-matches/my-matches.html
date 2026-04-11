@@ -1,24 +1,31 @@
-<div class="npd-welcome-container">
-    <mat-card class="npd-matches-card">
-        <mat-card-header>
-            <mat-card-title>My Matches</mat-card-title>
-        </mat-card-header>
-        <mat-card-content>
-            @if (loading()) {
-            <div class="npd-spinner-container">
-                <mat-progress-spinner mode="indeterminate" diameter="36"></mat-progress-spinner>
-            </div>
-            } @else if (error()) {
-            <mat-error>{{ error() }}</mat-error>
-            } @else if (matches().length === 0) {
-            <p>No matches found.</p>
-            } @else {
-            <mat-nav-list>
-                @for (match of matches(); track match.id) {
-                <a mat-list-item [routerLink]="['/play-match', match.id]" class="npd-match-link">{{ match.name }}</a>
-                }
-            </mat-nav-list>
+<mat-card>
+    <mat-card-header>
+        <mat-card-title>
+			<mat-icon>sword_rose</mat-icon>
+            My Matches
+        </mat-card-title>
+    </mat-card-header>
+    <mat-card-content>
+        @if (loading()) {
+        <div class="npd-spinner-container">
+            <mat-progress-spinner mode="indeterminate" diameter="36"></mat-progress-spinner>
+        </div>
+        } @else if (error()) {
+        <mat-error>{{ error() }}</mat-error>
+        } @else if (matches().length === 0) {
+        <p>No matches found.</p>
+        } @else {
+        <mat-nav-list>
+            @for (match of matches(); track match.id) {
+            <mat-list-item [routerLink]="['/play-match', match.id]">
+                <span matListItemTitle>{{ match.name }}</span>
+                <div matListItemMeta>
+                    <mat-icon>chevron_right</mat-icon>
+                </div>
+            </mat-list-item>
+            <mat-divider></mat-divider>
             }
-        </mat-card-content>
-    </mat-card>
-</div>
+        </mat-nav-list>
+        }
+    </mat-card-content>
+</mat-card>
