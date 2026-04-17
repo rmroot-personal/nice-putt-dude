@@ -46,7 +46,20 @@
             "development": {
               "optimization": false,
               "extractLicenses": false,
-              "sourceMap": true
+              "sourceMap": true,
+              "fileReplacements": [
+              ]
+            },
+            "emulator": {
+              "optimization": false,
+              "extractLicenses": false,
+              "sourceMap": true,
+              "fileReplacements": [
+                {
+                  "replace": "src/environments/firebase.ts",
+                  "with": "src/environments/firebase.emulator.ts"
+                }
+              ]
             }
           },
           "defaultConfiguration": "production"
@@ -62,6 +75,12 @@
             }
           },
           "defaultConfiguration": "development"
+        },
+        "serve:emulator": {
+          "builder": "@angular/build:dev-server",
+          "options": {
+            "buildTarget": "nice-putt-dude:build:emulator"
+          }
         },
         "test": {
           "builder": "@angular/build:unit-test"
