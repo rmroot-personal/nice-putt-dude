@@ -1,13 +1,149 @@
-<div class="npd-scorecard-container">
-	@if (loading()) {
-		<p>Loading scorecard...</p>
-	} @else if (error()) {
-		<p>{{ error() }}</p>
-	} @else if (scorecard()) {
-		<a [routerLink]="['/play-match', scorecard()?.matchId]" class="npd-back-link">
-			&larr; Back to Match
-		</a>
-		<h2>Scorecard: {{ scorecard()?.id }}</h2>
-		<!-- Add more scorecard details here -->
-	}
+<div class="sc-page">
+  @if (loading()) {
+  <div class="sc-loading">
+    <mat-progress-spinner mode="indeterminate" diameter="32"></mat-progress-spinner>
+    <span>Loading scorecard...</span>
+  </div>
+  } @else if (error()) {
+  <p class="sc-error" role="alert">{{ error() }}</p>
+  } @else if (scorecard()) {
+
+  <div class="sc-header">
+    <a [routerLink]="['/play-match', scorecard()!.matchId]" class="sc-back" aria-label="Back to match">
+      <mat-icon>arrow_back</mat-icon>
+      <span>Match</span>
+    </a>
+
+    <div [class]="'sc-total-badge ' + scoreRel(totalStrokes(), totalPar())" aria-live="polite"
+      [attr.aria-label]="'Total score: ' + totalScoreStr() + ', ' + totalStrokes() + ' strokes'">
+      <span class="sc-total-label">Total</span>
+      <span class="sc-total-value">{{ totalScoreStr() }}</span>
+      <span class="sc-total-strokes">{{ totalStrokes() }} / {{ totalPar() }}</span>
+    </div>
+
+    @if (saving()) {
+    <mat-progress-spinner mode="indeterminate" diameter="18" class="sc-saving-spinner"
+      aria-label="Saving..."></mat-progress-spinner>
+    }
+  </div>
+
+  <!-- Front 9 -->
+  <mat-card class="sc-nine-card">
+    <mat-card-header>
+      <mat-card-title>Front 9</mat-card-title>
+      <div class="nine-summary" aria-label="Front 9 summary">
+        <span class="nine-par">Par {{ front9Par() }}</span>
+        <span class="nine-strokes">{{ front9Strokes() }}</span>
+        <span [class]="'nine-diff ' + scoreRel(front9Strokes(), front9Par())">
+          {{ formatDiff(front9Diff()) }}
+        </span>
+      </div>
+    </mat-card-header>
+    <mat-card-content>
+      <div class="hole-list" role="list" aria-label="Front 9 holes">
+        @for (hole of front9(); track hole.key) {
+        <div class="hole-row" role="listitem">
+          <span class="hole-num" aria-hidden="true">{{ hole.num }}</span>
+          <span class="hole-par">Par&nbsp;{{ hole.par }}</span>
+          <div class="stroke-stepper" role="group" [attr.aria-label]="'Hole ' + hole.num + ' strokes'">
+            <button mat-icon-button class="step-btn" (click)="decrement(hole.key)"
+              [disabled]="!canEdit() || hole.strokes <= 1"
+              [attr.aria-label]="'Hole ' + hole.num + ': decrease strokes'">
+              <mat-icon>remove</mat-icon>
+            </button>
+            <span class="stroke-val" aria-live="polite">{{ hole.strokes }}</span>
+            <button mat-icon-button class="step-btn" (click)="increment(hole.key)" [disabled]="!canEdit()"
+              [attr.aria-label]="'Hole ' + hole.num + ': increase strokes'">
+              <mat-icon>add</mat-icon>
+            </button>
+          </div>
+          <span [class]="'score-badge ' + scoreRel(hole.strokes, hole.par)"
+            [attr.aria-label]="'Score: ' + formatDiff(hole.strokes - hole.par)">
+            {{ formatDiff(hole.strokes - hole.par) }}
+          </span>
+        </div>
+        @if (!$last) {
+        <mat-divider></mat-divider>
+        }
+        }
+      </div>
+    </mat-card-content>
+  </mat-card>
+
+  <!-- Back 9 -->
+  <mat-card class="sc-nine-card">
+    <mat-card-header>
+      <mat-card-title>Back 9</mat-card-title>
+      <div class="nine-summary" aria-label="Back 9 summary">
+        <span class="nine-par">Par {{ back9Par() }}</span>
+        <span class="nine-strokes">{{ back9Strokes() }}</span>
+        <span [class]="'nine-diff ' + scoreRel(back9Strokes(), back9Par())">
+          {{ formatDiff(back9Diff()) }}
+        </span>
+      </div>
+    </mat-card-header>
+    <mat-card-content>
+      <div class="hole-list" role="list" aria-label="Back 9 holes">
+        @for (hole of back9(); track hole.key) {
+        <div class="hole-row" role="listitem">
+          <span class="hole-num" aria-hidden="true">{{ hole.num }}</span>
+          <span class="hole-par">Par&nbsp;{{ hole.par }}</span>
+          <div class="stroke-stepper" role="group" [attr.aria-label]="'Hole ' + hole.num + ' strokes'">
+            <button mat-icon-button class="step-btn" (click)="decrement(hole.key)"
+              [disabled]="!canEdit() || hole.strokes <= 1"
+              [attr.aria-label]="'Hole ' + hole.num + ': decrease strokes'">
+              <mat-icon>remove</mat-icon>
+            </button>
+            <span class="stroke-val" aria-live="polite">{{ hole.strokes }}</span>
+            <button mat-icon-button class="step-btn" (click)="increment(hole.key)" [disabled]="!canEdit()"
+              [attr.aria-label]="'Hole ' + hole.num + ': increase strokes'">
+              <mat-icon>add</mat-icon>
+            </button>
+          </div>
+          <span [class]="'score-badge ' + scoreRel(hole.strokes, hole.par)"
+            [attr.aria-label]="'Score: ' + formatDiff(hole.strokes - hole.par)">
+            {{ formatDiff(hole.strokes - hole.par) }}
+          </span>
+        </div>
+        @if (!$last) {
+        <mat-divider></mat-divider>
+        }
+        }
+      </div>
+    </mat-card-content>
+  </mat-card>
+
+  <!-- Totals Summary -->
+  <mat-card class="sc-summary-card">
+    <mat-card-content>
+      <div class="summary-row" role="row">
+        <span class="summary-label">Out</span>
+        <span class="summary-strokes">{{ front9Strokes() }}</span>
+        <span class="summary-par">/ {{ front9Par() }}</span>
+        <span [class]="'summary-diff ' + scoreRel(front9Strokes(), front9Par())">
+          {{ formatDiff(front9Diff()) }}
+        </span>
+      </div>
+      <mat-divider></mat-divider>
+      <div class="summary-row" role="row">
+        <span class="summary-label">In</span>
+        <span class="summary-strokes">{{ back9Strokes() }}</span>
+        <span class="summary-par">/ {{ back9Par() }}</span>
+        <span [class]="'summary-diff ' + scoreRel(back9Strokes(), back9Par())">
+          {{ formatDiff(back9Diff()) }}
+        </span>
+      </div>
+      <mat-divider></mat-divider>
+      <div class="summary-row summary-total" role="row">
+        <span class="summary-label">Total</span>
+        <span class="summary-strokes">{{ totalStrokes() }}</span>
+        <span class="summary-par">/ {{ totalPar() }}</span>
+        <span [class]="'summary-diff ' + scoreRel(totalStrokes(), totalPar())">
+          {{ totalScoreStr() }}
+        </span>
+      </div>
+    </mat-card-content>
+  </mat-card>
+
+  }
 </div>

@@ -1,6 +1,7 @@
 import { onDocumentWritten } from "firebase-functions/v2/firestore";
 import * as logger from "firebase-functions/logger";
 import * as admin from "firebase-admin";
+import { FieldValue } from "firebase-admin/firestore";
 
 interface ScorecardHole {
   par: number;
@@ -61,7 +62,7 @@ export const updateScoreboard = onDocumentWritten(
       await db
         .collection("scoreboards")
         .doc(matchId)
-        .set({ matchId, entries: [], updatedAt: admin.firestore.FieldValue.serverTimestamp() });
+        .set({ matchId, entries: [], updatedAt: FieldValue.serverTimestamp() });
       return;
     }
 
@@ -135,7 +136,7 @@ export const updateScoreboard = onDocumentWritten(
     await db
       .collection("scoreboards")
       .doc(matchId)
-      .set({ matchId, entries, updatedAt: admin.firestore.FieldValue.serverTimestamp() });
+      .set({ matchId, entries, updatedAt: FieldValue.serverTimestamp() });
 
     logger.info(`Scoreboard updated for match ${matchId}`, { playerCount: entries.length });
   },

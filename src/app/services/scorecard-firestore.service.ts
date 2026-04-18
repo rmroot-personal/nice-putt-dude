@@ -1,8 +1,8 @@
 import { Injectable, inject } from '@angular/core';
-import { Firestore, collection, addDoc, doc, getDoc, getDocs } from '@angular/fire/firestore';
+import { Firestore, collection, addDoc, doc, getDoc, getDocs, updateDoc } from '@angular/fire/firestore';
 import { collectionData } from '@angular/fire/firestore';
 import { UserService } from './user.service';
-import { IScorecard } from '../models/scorecard.model';
+import { EighteenHoles, IScorecard } from '../models/scorecard.model';
 import { query, where } from 'firebase/firestore';
 import { Observable } from 'rxjs';
 
@@ -59,5 +59,10 @@ export class ScorecardFirestoreService {
         const q = query(scorecardsRef, where('matchId', '==', matchId));
         // idField ensures the id is included in the returned objects
         return collectionData(q, { idField: 'id' }) as Observable<IScorecard[]>;
+    }
+
+    async updateHoleStrokes(id: string, holes: EighteenHoles): Promise<void> {
+        const docRef = doc(this.firestore, 'scorecards', id);
+        await updateDoc(docRef, { holes });
     }
 }
