@@ -7,7 +7,9 @@
     "start:emulator": "ng serve --configuration emulator",
     "build": "ng build",
     "watch": "ng build --watch --configuration development",
-    "test": "ng test"
+    "test": "ng test",
+    "emulator:start": "firebase emulators:start --import=./emulator-data --export-on-exit=./emulator-data",
+    "emulator:seed": "tsx scripts/seed.ts"
   },
   "private": true,
   "packageManager": "npm@11.12.0",
@@ -29,8 +31,10 @@
     "@angular/build": "^21.2.3",
     "@angular/cli": "^21.2.3",
     "@angular/compiler-cli": "^21.2.0",
+    "firebase-admin": "^13.8.0",
     "jsdom": "^28.0.0",
     "prettier": "^3.8.1",
+    "tsx": "^4.21.0",
     "typescript": "~5.9.2",
     "vitest": "^4.0.8"
   }

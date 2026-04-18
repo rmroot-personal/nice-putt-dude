@@ -42,6 +42,9 @@ __screenshots__/
 # Firebase environment (do not commit secrets)
 src/environments/firebase.ts
 
+# Emulator exported data (committed intentionally via emulator:seed workflow)
+# To share test data, run: npm run emulator:seed, then commit emulator-data/
+
 # System files
 .DS_Store
 Thumbs.db
