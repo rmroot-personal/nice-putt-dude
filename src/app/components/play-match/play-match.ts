@@ -11,8 +11,9 @@ import { MatCard, MatCardContent, MatCardHeader, MatCardTitle } from '@angular/m
 import { MatIcon } from '@angular/material/icon';
 import { MatProgressSpinner } from '@angular/material/progress-spinner';
 import { MatError } from '@angular/material/form-field';
-import { MatDivider, MatListItem, MatNavList } from '@angular/material/list';
-import { UserDisplayNamePipe } from '../../pipes/user-display-name-pipe';
+import { MatDivider } from '@angular/material/list';
+import { ScoreboardsFirestoreService } from '../../services/scoreboards-firestore.service';
+import { IScoreboard } from '../../models/scoreboard.model';
 
 @Component({
   selector: 'app-play-match',
@@ -24,10 +25,7 @@ import { UserDisplayNamePipe } from '../../pipes/user-display-name-pipe';
     MatCardContent,
     MatProgressSpinner,
     MatError,
-    MatListItem,
     RouterLink,
-    MatNavList,
-    UserDisplayNamePipe,
     MatDivider
   ],
   templateUrl: './play-match.html',
@@ -39,18 +37,34 @@ export class PlayMatch {
   private readonly scorecardService = inject(ScorecardFirestoreService);
   private readonly userService = inject(UserService);
   private readonly golfCoursesService = inject(GolfCoursesFirestoreService);
+  private readonly scoreboardsService = inject(ScoreboardsFirestoreService);
   private readonly router = inject(Router);
 
-  readonly match = signal<IMatch | null>(null);
-  readonly loadingMatch = signal(true);
-  readonly loadingScorecards = signal(true);
-  readonly error = signal<string | null>(null);
-  readonly scorecards = signal<IScorecard[]>([]);
-  readonly user = computed(() => this.userService.user());
+  readonly match$ = signal<IMatch | null>(null);
+  get match() {
+    return this.match$();
+  }
+  readonly loadingMatch$ = signal(true);
+  readonly loadingScorecards$ = signal(true);
+  get loading() {
+    return this.loadingMatch$() || this.loadingScorecards$();
+  }
+  readonly error$ = signal<string | null>(null);
+  get error() {
+    return this.error$();
+  }
+  readonly scoreboard$ = signal<IScoreboard | null>(null);
+  get scoreboard() {
+    return this.scoreboard$();
+  }
+  readonly user$ = computed(() => this.userService.user());
+  get user() {
+    return this.user$();
+  }
   readonly userHasScorecard = computed(() => {
-    const user = this.user();
+    const user = this.user;
     if (!user) return false;
-    return this.scorecards().some(entry => entry.userId === user.uid);
+    return this.scoreboard?.entries.some(entry => entry.userId === user.uid) ?? false;
   });
 
   constructor() {
@@ -59,46 +73,46 @@ export class PlayMatch {
       effect(() => {
         const sub = this.matchesService.match$(id).subscribe({
           next: match => {
-            this.match.set(match);
-            this.loadingMatch.set(false);
+            this.match$.set(match);
+            this.loadingMatch$.set(false);
           },
           error: err => {
-            this.error.set('Could not load match or scorecards');
-            this.loadingMatch.set(false);
+            this.error$.set('Could not load match');
+            this.loadingMatch$.set(false);
           }
         });
         return () => sub.unsubscribe();
       })
 
 
-      // Subscribe to real-time scorecards for this match
+      // Subscribe to real-time scoreboards for this match
       effect(() => {
-        const sub = this.scorecardService.scorecardsForMatch$(id).subscribe({
-          next: scorecards => {
-            this.scorecards.set(scorecards);
-            this.loadingScorecards.set(false);
+        const sub = this.scoreboardsService.getScoreboard$(id).subscribe({
+          next: scoreboard => {
+            this.scoreboard$.set(scoreboard);
+            this.loadingScorecards$.set(false);
           },
           error: err => {
-            this.error.set('Could not load scorecards');
-            this.loadingScorecards.set(false);
+            this.error$.set('Could not load scoreboard');
+            this.loadingScorecards$.set(false);
           }
         });
         return () => sub.unsubscribe();
       });
 
     } else {
-      this.error.set('No match id provided');
-      this.loadingMatch.set(false);
+      this.error$.set('No match id provided');
+      this.loadingMatch$.set(false);
     }
 
   }
 
 
   async addUserScorecard() {
-    const user = this.user();
-    const match = this.match();
+    const user = this.user;
+    const match = this.match;
     if (!user || !match) {
-      this.error.set('User or match not loaded');
+      this.error$.set('User or match not loaded');
       return;
     }
     // Assume match has courseId
@@ -111,15 +125,15 @@ export class PlayMatch {
     // Defensive: courseId may be in match or not
     const courseId = match.golfCourseId;
     if (!courseId) {
-      this.error.set('No courseId found for this match');
+      this.error$.set('No courseId found for this match');
       return;
     }
-    this.loadingScorecards.set(true);
+    this.loadingScorecards$.set(true);
     try {
       const course = await this.golfCoursesService.getGolfCourseById(courseId);
       if (!course) {
-        this.error.set('Golf course not found');
-        this.loadingScorecards.set(false);
+        this.error$.set('Golf course not found');
+        this.loadingScorecards$.set(false);
         return;
       }
       const newScorecard: Omit<IScorecard, 'id'> = {
@@ -133,15 +147,15 @@ export class PlayMatch {
       //navigate to scorecard
       this.router.navigate(['/scorecard', newScorecardId]);
     } catch (err) {
-      this.error.set('Failed to add scorecard');
-      this.loadingScorecards.set(false);
+      this.error$.set('Failed to add scorecard');
+      this.loadingScorecards$.set(false);
     }
   }
 
   async deleteMatch() {
-    const match = this.match();
+    const match = this.match;
     if (!match) {
-      this.error.set('Match not loaded');
+      this.error$.set('Match not loaded');
       return;
     }
     await this.matchesService.deleteMatch(match.id);

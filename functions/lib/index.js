@@ -1,12 +1,4 @@
 "use strict";
-/**
- * Import function triggers from their respective submodules:
- *
- * import {onCall} from "firebase-functions/v2/https";
- * import {onDocumentWritten} from "firebase-functions/v2/firestore";
- *
- * See a full list of supported triggers at https://firebase.google.com/docs/functions
- */
 var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
     var desc = Object.getOwnPropertyDescriptor(m, k);
@@ -40,53 +32,15 @@ var __importStar = (this && this.__importStar) || (function () {
         return result;
     };
 })();
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.helloWorld = void 0;
+exports.updateScoreboard = void 0;
 const firebase_functions_1 = require("firebase-functions");
-const https_1 = require("firebase-functions/https");
-const logger = __importStar(require("firebase-functions/logger"));
-const cors_1 = __importDefault(require("cors"));
 const admin = __importStar(require("firebase-admin"));
 // Initialize Firebase Admin SDK if not already initialized
 if (!admin.apps.length) {
     admin.initializeApp();
 }
-// Start writing functions
-// https://firebase.google.com/docs/functions/typescript
-// For cost control, you can set the maximum number of containers that can be
-// running at the same time. This helps mitigate the impact of unexpected
-// traffic spikes by instead downgrading performance. This limit is a
-// per-function limit. You can override the limit for each function using the
-// `maxInstances` option in the function's options, e.g.
-// `onRequest({ maxInstances: 5 }, (req, res) => { ... })`.
-// NOTE: setGlobalOptions does not apply to functions using the v1 API. V1
-// functions should each use functions.runWith({ maxInstances: 10 }) instead.
-// In the v1 API, each function can only serve one request per container, so
-// this will be the maximum concurrent request count.
 (0, firebase_functions_1.setGlobalOptions)({ maxInstances: 10 });
-exports.helloWorld = (0, https_1.onRequest)(async (request, response) => {
-    const corsHandler = (0, cors_1.default)({ origin: "http://localhost:4200" });
-    corsHandler(request, response, async () => {
-        // Get the Authorization header
-        const authHeader = request.headers.authorization;
-        if (!authHeader || !authHeader.startsWith("Bearer ")) {
-            response.status(401).send("Missing or invalid Authorization header");
-            return;
-        }
-        const idToken = authHeader.split("Bearer ")[1];
-        try {
-            // Verify the ID token
-            const decodedToken = await admin.auth().verifyIdToken(idToken);
-            logger.info("Authenticated user:", { uid: decodedToken.uid });
-            response.send("Hello from Nice Putt Dude!");
-        }
-        catch (error) {
-            logger.error("Token verification failed", error);
-            response.status(401).send("Unauthorized: Invalid or expired token");
-        }
-    });
-});
+var scoreboard_1 = require("./scoreboard");
+Object.defineProperty(exports, "updateScoreboard", { enumerable: true, get: function () { return scoreboard_1.updateScoreboard; } });
 //# sourceMappingURL=index.js.map
