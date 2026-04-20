@@ -10,24 +10,24 @@
  *  npm run emulator:seed
  *
  * Data files:
- *  scripts/seed/users.ts       — Auth users & publicUsers
- *  scripts/seed/courses.ts     — Golf courses
- *  scripts/seed/matches.ts     — Matches
- *  scripts/seed/friendships.ts — Friendships
- *  scripts/seed/scorecards.ts  — Scorecards
- *  scripts/seed/scoreboards.ts — Scoreboard computation & write
+ *  scripts/seed-data/users.ts       — Auth users & publicUsers
+ *  scripts/seed-data/courses.ts     — Golf courses
+ *  scripts/seed-data/matches.ts     — Matches
+ *  scripts/seed-data/friendships.ts — Friendships
+ *  scripts/seed-data/scorecards.ts  — Scorecards
+ *  scripts/seed-data/scoreboards.ts — Scoreboard computation & write
  */
 
 import { initializeApp } from 'firebase-admin/app';
 import { getAuth } from 'firebase-admin/auth';
 import { getFirestore } from 'firebase-admin/firestore';
 
-import { TEST_USERS, seedAuthUsers, seedPublicUsers } from './seed/users';
-import { seedGolfCourses } from './seed/courses';
-import { seedMatches } from './seed/matches';
-import { seedFriendships } from './seed/friendships';
-import { seedScorecards } from './seed/scorecards';
-import { seedScoreboards } from './seed/scoreboards';
+import { TEST_USERS, seedAuthUsers, seedPublicUsers } from './seed-data/users';
+import { seedGolfCourses } from './seed-data/courses';
+import { seedMatches } from './seed-data/matches';
+import { seedFriendships } from './seed-data/friendships';
+import { seedScorecards } from './seed-data/scorecards';
+import { seedScoreboards } from './seed-data/scoreboards';
 
 // Point the Admin SDK at the local emulators
 process.env['FIRESTORE_EMULATOR_HOST'] = 'localhost:8080';

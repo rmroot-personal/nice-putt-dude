@@ -9,7 +9,7 @@
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
     "emulator:start": "firebase emulators:start --import=./emulator-data --export-on-exit=./emulator-data",
-    "emulator:seed": "tsx emulator-see/seed.ts"
+    "emulator:seed": "tsx emulator-seed/seed.ts"
   },
   "private": true,
   "packageManager": "npm@11.12.0",

@@ -34,6 +34,7 @@ export async function seedAuthUsers(auth: Auth) {
         email: user.email,
         password: user.password,
         displayName: user.displayName,
+        photoURL: user.photoURL,
         emailVerified: true,
       });
       console.log(`  Created user: ${user.email}`);
