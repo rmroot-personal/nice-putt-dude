@@ -1,52 +1,80 @@
-import { Component, signal, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatInputModule } from '@angular/material/input';
-import { MatButtonModule } from '@angular/material/button';
-
+import { Router, RouterLink } from '@angular/router';
+import { MatCard, MatCardContent, MatCardHeader, MatCardTitle } from '@angular/material/card';
+import { MatFormField, MatLabel, MatError, MatHint } from '@angular/material/form-field';
+import { MatInput } from '@angular/material/input';
+import { MatSelect } from '@angular/material/select';
+import { MatOption } from '@angular/material/core';
+import { MatButton, MatAnchor } from '@angular/material/button';
+import { MatIcon } from '@angular/material/icon';
+import { MatProgressSpinner } from '@angular/material/progress-spinner';
+import { MatDivider } from '@angular/material/list';
+import { MatCheckbox } from '@angular/material/checkbox';
 import { MatchesFirestoreService } from '../../services/matches-firestore.service';
 import { GolfCoursesFirestoreService } from '../../services/golf-courses-firestore.service';
+import { FriendshipsFirestoreService } from '../../services/friendships-firestore.service';
+import { PublicUsersFirestoreService } from '../../services/public-users-firestore.service';
+import { UserService } from '../../services/user.service';
 import { IGolfCourse } from '../../models/golf-course.model';
-import { Router, RouterLink } from '@angular/router';
-import { MatIcon } from "@angular/material/icon";
+import { IPublicUser } from '../../models/public-users.model';
 
 @Component({
   selector: 'app-new-match',
   imports: [
     ReactiveFormsModule,
-    MatFormFieldModule,
-    MatInputModule,
-    MatButtonModule,
+    RouterLink,
+    MatCard,
+    MatCardHeader,
+    MatCardTitle,
+    MatCardContent,
+    MatFormField,
+    MatLabel,
+    MatError,
+    MatHint,
+    MatInput,
+    MatSelect,
+    MatOption,
+    MatButton,
+    MatAnchor,
     MatIcon,
-    RouterLink
-],
+    MatProgressSpinner,
+    MatDivider,
+    MatCheckbox,
+  ],
   templateUrl: './new-match.html',
   styleUrl: './new-match.css',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class NewMatch {
   private readonly matchesFirestore = inject(MatchesFirestoreService);
   private readonly golfCoursesService = inject(GolfCoursesFirestoreService);
+  private readonly friendshipsService = inject(FriendshipsFirestoreService);
+  private readonly publicUsersService = inject(PublicUsersFirestoreService);
+  private readonly userService = inject(UserService);
   private readonly router = inject(Router);
 
   readonly form = new FormGroup({
     name: new FormControl('', { nonNullable: true, validators: [Validators.required, Validators.maxLength(50)] }),
-    golfCourseId: new FormControl('', { nonNullable: true, validators: [Validators.required] })
+    golfCourseId: new FormControl('', { nonNullable: true, validators: [Validators.required] }),
+    players: new FormControl<string[]>([], { nonNullable: true }),
   });
 
-  get name() {
-    return this.form.get('name') as FormControl<string>;
-  }
-
-  get golfCourseId() {
-    return this.form.get('golfCourseId') as FormControl<string>;
-  }
+  get name() { return this.form.controls.name; }
+  get golfCourseId() { return this.form.controls.golfCourseId; }
+  get players() { return this.form.controls.players; }
 
   readonly golfCourses = signal<IGolfCourse[]>([]);
   readonly loadingCourses = signal(true);
   readonly coursesError = signal<string | null>(null);
 
+  readonly friends = signal<IPublicUser[]>([]);
+  readonly loadingFriends = signal(true);
+
+  readonly submitting = signal(false);
+  readonly submitError = signal<string | null>(null);
+
   constructor() {
-    // Fetch golf courses for dropdown
     this.golfCoursesService.getAllGolfCourses()
       .then(courses => {
         this.golfCourses.set(courses);
@@ -56,16 +84,45 @@ export class NewMatch {
         this.coursesError.set('Failed to load golf courses');
         this.loadingCourses.set(false);
       });
+
+    this.loadFriends();
   }
 
-  async onSubmit() {
-    if (this.form.invalid) return;
+  private async loadFriends(): Promise<void> {
+    const user = this.userService.user();
+    if (!user) {
+      this.loadingFriends.set(false);
+      return;
+    }
     try {
-      let matchId: string = await this.matchesFirestore.addMatch(this.name.value ?? '', this.golfCourseId.value ?? '');
+      const friendships = await this.friendshipsService.getFriendshipsForCurrentUser();
+      const friendIds = friendships.map(f =>
+        f.user1Id === user.uid ? f.user2Id : f.user1Id
+      );
+      if (friendIds.length === 0) {
+        this.loadingFriends.set(false);
+        return;
+      }
+      const publicUsers = await Promise.all(
+        friendIds.map(id => this.publicUsersService.getPublicUserByUserId(id))
+      );
+      this.friends.set(publicUsers.filter((u): u is IPublicUser => u !== null));
+    } finally {
+      this.loadingFriends.set(false);
+    }
+  }
+
+  async onSubmit(): Promise<void> {
+    if (this.form.invalid || this.submitting()) return;
+    this.submitting.set(true);
+    this.submitError.set(null);
+    try {
+      const { name, golfCourseId, players } = this.form.getRawValue();
+      const matchId = await this.matchesFirestore.addMatch(name, golfCourseId, players);
       this.router.navigate(['/play-match', matchId]);
-    } catch (err) {
-      // TODO: show error to user
-      console.error('Failed to create match:', err);
+    } catch {
+      this.submitError.set('Failed to create match. Please try again.');
+      this.submitting.set(false);
     }
   }
 }

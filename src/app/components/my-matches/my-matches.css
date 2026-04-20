@@ -17,6 +17,12 @@ mat-card-title {
   display: flex;
   align-items: center;
   gap: 0.5rem;
+  flex: 1;
+}
+
+.header-action {
+  margin-left: auto;
+  flex-shrink: 0;
 }
 
 mat-card-title mat-icon {

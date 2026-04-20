@@ -1,4 +1,9 @@
 @if (user) {
+<a [routerLink]="['/my-matches']" class="sc-back" aria-label="Back to my matches">
+  <mat-icon>arrow_back</mat-icon>
+  <span>Back to My Matches</span>
+</a>
+
 <mat-card class="match-card">
   <mat-card-header>
     <mat-card-title>
@@ -11,6 +16,20 @@
     </a>
     }
   </mat-card-header>
+
+  @if (user && !userHasScorecard()) {
+  <div class="add-scorecard-row">
+    <button mat-raised-button color="primary" type="button" (click)="addUserScorecard()"
+      [disabled]="addingScorecard$()">
+      @if (addingScorecard$()) {
+      <mat-progress-spinner mode="indeterminate" diameter="18" class="btn-spinner"></mat-progress-spinner>
+      } @else {
+      <mat-icon>add</mat-icon>
+      }
+      Add your scorecard
+    </button>
+  </div>
+  }
 
   <mat-card-content>
     @if (loading) {
@@ -28,54 +47,29 @@
     </div>
 
     @if (!scoreboard?.entries?.length) {
-    <p class="no-entries">No scorecards found for this match yet.</p>
+    <p class="no-entries">No scorecards found for this match yet....</p>
     } @else {
     <div class="leaderboard" role="list">
       @for (entry of scoreboard?.entries; track entry.scorecardId; let index = $index) {
-      <a
-        class="leaderboard-row"
-        [routerLink]="['/scorecard', entry.scorecardId]"
-        role="listitem"
-        [attr.aria-label]="'View scorecard for ' + entry.userDisplayName + ', place ' + entry.place + ', score ' + entry.score"
-      >
-        <span
-          class="place-badge"
-          [class.place-gold]="entry.place === 1"
-          [class.place-silver]="entry.place === 2"
-          [class.place-bronze]="entry.place === 3"
-          aria-hidden="true"
-        >{{ entry.place }}</span>
+      <a class="leaderboard-row" [routerLink]="['/scorecard', entry.scorecardId]" role="listitem"
+        [attr.aria-label]="'View scorecard for ' + entry.userDisplayName + ', place ' + entry.place + ', score ' + entry.score">
+        <span class="place-badge" [class.place-gold]="entry.place === 1" [class.place-silver]="entry.place === 2"
+          [class.place-bronze]="entry.place === 3" aria-hidden="true">{{ entry.place }}</span>
 
-        <img
-          [src]="entry.userThumbnail || 'https://api.dicebear.com/7.x/bottts/svg?seed=' + entry.userId"
-          [alt]="entry.userDisplayName + ' avatar'"
-          class="player-avatar"
-        />
+        <img [src]="entry.userThumbnail || 'https://api.dicebear.com/7.x/bottts/svg?seed=' + entry.userId"
+          [alt]="entry.userDisplayName + ' avatar'" class="player-avatar" />
 
         <span class="player-name">{{ entry.userDisplayName }}</span>
 
-        <span
-          class="player-score"
-          [class.score-under]="entry.score.startsWith('-')"
-          [class.score-over]="entry.score.startsWith('+')"
-          [class.score-even]="entry.score === 'E'"
-          [attr.aria-label]="'Score: ' + entry.score"
-        >{{ entry.score }}</span>
+        <span class="player-score" [class.score-under]="entry.score.startsWith('-')"
+          [class.score-over]="entry.score.startsWith('+')" [class.score-even]="entry.score === 'E'"
+          [attr.aria-label]="'Score: ' + entry.score">{{ entry.score }}</span>
 
         <mat-icon class="row-chevron" aria-hidden="true">chevron_right</mat-icon>
       </a>
-      @if (index < (scoreboard?.entries?.length ?? 0) - 1) {
-      <mat-divider></mat-divider>
-      }
-      }
-    </div>
-    }
-
-    @if (user && !userHasScorecard) {
-    <div class="add-scorecard-row">
-      <button mat-raised-button color="primary" type="button" (click)="addUserScorecard()" [disabled]="loading">
-        <mat-icon>add</mat-icon> Add your scorecard
-      </button>
+      @if (index < (scoreboard?.entries?.length ?? 0) - 1) { <mat-divider></mat-divider>
+        }
+        }
     </div>
     }
 

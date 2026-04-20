@@ -13,7 +13,7 @@ export class MatchesFirestoreService {
   private readonly userService = inject(UserService);
 
 
-  async addMatch(name: string, golfCourseId: string): Promise<string> {
+  async addMatch(name: string, golfCourseId: string, players: string[] = []): Promise<string> {
     const user = this.userService.user();
     if (!user) throw new Error('User must be signed in to create a match');
     const matchesRef = collection(this.firestore, 'matches');
@@ -22,7 +22,7 @@ export class MatchesFirestoreService {
       golfCourseId,
       createdByUserId: user.uid,
       createdAt: new Date().toISOString(),
-      players: []
+      players
     });
     return docRef.id;
   }

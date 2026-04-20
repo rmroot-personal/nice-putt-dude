@@ -1,9 +1,13 @@
 <mat-card class="matches-card">
   <mat-card-header>
     <mat-card-title>
-      <mat-icon>sword_rose</mat-icon>
+      <mat-icon>sports_golf</mat-icon>
       My Matches
     </mat-card-title>
+    <a mat-stroked-button [routerLink]="['/new-match']" class="header-action" aria-label="Create new match">
+      <mat-icon>add</mat-icon>
+      New Match
+    </a>
   </mat-card-header>
 
   <mat-card-content>

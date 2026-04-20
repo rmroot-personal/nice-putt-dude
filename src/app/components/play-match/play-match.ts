@@ -12,6 +12,7 @@ import { MatIcon } from '@angular/material/icon';
 import { MatProgressSpinner } from '@angular/material/progress-spinner';
 import { MatError } from '@angular/material/form-field';
 import { MatDivider } from '@angular/material/list';
+import { MatButton } from '@angular/material/button';
 import { ScoreboardsFirestoreService } from '../../services/scoreboards-firestore.service';
 import { IScoreboard } from '../../models/scoreboard.model';
 
@@ -26,7 +27,8 @@ import { IScoreboard } from '../../models/scoreboard.model';
     MatProgressSpinner,
     MatError,
     RouterLink,
-    MatDivider
+    MatDivider,
+    MatButton,
   ],
   templateUrl: './play-match.html',
   styleUrl: './play-match.css',
@@ -46,6 +48,7 @@ export class PlayMatch {
   }
   readonly loadingMatch$ = signal(true);
   readonly loadingScorecards$ = signal(true);
+  readonly addingScorecard$ = signal(false);
   get loading() {
     return this.loadingMatch$() || this.loadingScorecards$();
   }
@@ -64,6 +67,7 @@ export class PlayMatch {
   readonly userHasScorecard = computed(() => {
     const user = this.user;
     if (!user) return false;
+    console.log(this.scoreboard)
     return this.scoreboard?.entries.some(entry => entry.userId === user.uid) ?? false;
   });
 
@@ -115,25 +119,17 @@ export class PlayMatch {
       this.error$.set('User or match not loaded');
       return;
     }
-    // Assume match has courseId
-    // If not, error
-    // If courseId is not present, error
-    // Otherwise, fetch course
-    // Then create a blank scorecard for the user
-    // Add to Firestore
-    // Reload scorecards
-    // Defensive: courseId may be in match or not
     const courseId = match.golfCourseId;
     if (!courseId) {
       this.error$.set('No courseId found for this match');
       return;
     }
-    this.loadingScorecards$.set(true);
+    this.addingScorecard$.set(true);
     try {
       const course = await this.golfCoursesService.getGolfCourseById(courseId);
       if (!course) {
         this.error$.set('Golf course not found');
-        this.loadingScorecards$.set(false);
+        this.addingScorecard$.set(false);
         return;
       }
       const newScorecard: Omit<IScorecard, 'id'> = {
@@ -144,11 +140,10 @@ export class PlayMatch {
         holes: getEighteenHolesFromCourse(course)
       };
       const newScorecardId = await this.scorecardService.addScorecard(newScorecard as IScorecard);
-      //navigate to scorecard
       this.router.navigate(['/scorecard', newScorecardId]);
-    } catch (err) {
+    } catch {
       this.error$.set('Failed to add scorecard');
-      this.loadingScorecards$.set(false);
+      this.addingScorecard$.set(false);
     }
   }
 

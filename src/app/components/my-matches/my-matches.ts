@@ -15,6 +15,7 @@ import { MatProgressSpinner } from '@angular/material/progress-spinner';
 import { MatIcon } from '@angular/material/icon';
 import { MatDivider } from '@angular/material/list';
 import { MatError } from '@angular/material/form-field';
+import { MatAnchor } from '@angular/material/button';
 
 interface MatchItem {
   match: IMatch;
@@ -35,6 +36,7 @@ interface MatchItem {
     MatIcon,
     MatDivider,
     MatError,
+    MatAnchor,
   ],
   templateUrl: './my-matches.html',
   styleUrl: './my-matches.css',

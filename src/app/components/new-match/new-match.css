@@ -1,4 +1,127 @@
-.npd-form-actions {
-	display: flex;
-	justify-content: flex-end;
+:host {
+  display: block;
+  padding: 1rem;
+}
+
+.new-match-card {
+  max-width: 560px;
+  margin: 0 auto;
+}
+
+mat-card-header {
+  display: flex;
+  align-items: center;
+  margin-bottom: 0.5rem;
+}
+
+mat-card-title {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex: 1;
+}
+
+mat-card-title mat-icon {
+  font-size: 28px;
+  height: 28px;
+  width: 28px;
+}
+
+.header-back {
+  flex-shrink: 0;
+}
+
+.new-match-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  padding-top: 0.5rem;
+}
+
+.full-width {
+  width: 100%;
+}
+
+.create-course-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  font-size: 0.875rem;
+  color: var(--mat-sys-primary, #1976d2);
+  text-decoration: none;
+  margin-top: -0.5rem;
+}
+
+.create-course-link:hover {
+  text-decoration: underline;
+}
+
+.create-course-link mat-icon {
+  font-size: 18px;
+  height: 18px;
+  width: 18px;
+}
+
+.section-label {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--mat-sys-on-surface-variant, #666);
+  padding-top: 0.25rem;
+}
+
+.section-label mat-icon {
+  font-size: 18px;
+  height: 18px;
+  width: 18px;
+}
+
+.friends-loading {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.5rem 0;
+  color: var(--mat-sys-on-surface-variant, #888);
+  font-size: 0.875rem;
+}
+
+.no-friends {
+  font-size: 0.875rem;
+  color: var(--mat-sys-on-surface-variant, #888);
+  margin: 0;
+}
+
+.friends-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  border: 1px solid var(--mat-sys-outline-variant, #e0e0e0);
+  border-radius: 8px;
+  padding: 0.5rem 0.75rem;
+}
+
+.friend-name {
+  font-size: 0.9375rem;
+}
+
+.submit-error {
+  color: var(--mat-sys-error, #c62828);
+  font-size: 0.875rem;
+  margin: 0;
+}
+
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+  padding-top: 0.25rem;
+}
+
+.btn-spinner {
+  display: inline-block;
+  margin-right: 0.5rem;
+  vertical-align: middle;
 }

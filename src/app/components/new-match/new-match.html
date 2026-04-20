@@ -1,42 +1,102 @@
-<form (ngSubmit)="onSubmit()" [formGroup]="form">
-    <mat-form-field appearance="outline" class="npd-form-field">
-        <mat-label>Name</mat-label>
-        <input matInput formControlName="name" maxlength="50" required />
+<mat-card class="new-match-card">
+  <mat-card-header>
+    <mat-card-title>
+      <mat-icon>add_circle</mat-icon>
+      New Match
+    </mat-card-title>
+    <a mat-stroked-button [routerLink]="['/my-matches']" class="header-back" aria-label="Back to my matches">
+      <mat-icon>arrow_back</mat-icon>
+      My Matches
+    </a>
+  </mat-card-header>
+
+  <mat-card-content>
+    <form [formGroup]="form" (ngSubmit)="onSubmit()" class="new-match-form">
+
+      <!-- Match name -->
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Match name</mat-label>
+        <input matInput formControlName="name" maxlength="50" autocomplete="off" />
         @if (name.hasError('required')) {
-        <mat-error>Name is required</mat-error>
+          <mat-error>Name is required</mat-error>
         }
-        @if (name.hasError('maxLength')) {
-        <mat-error>Name is too long</mat-error>
+        @if (name.hasError('maxlength')) {
+          <mat-error>Name must be 50 characters or fewer</mat-error>
         }
-    </mat-form-field>
+        <mat-hint align="end">{{ name.value.length }}/50</mat-hint>
+      </mat-form-field>
 
-
-    <mat-form-field appearance="outline" class="npd-form-field">
-        <mat-label>Golf Course</mat-label>
-        <select matNativeControl formControlName="golfCourseId" required>
-            <option value="" disabled selected>Select a golf course</option>
-            @if (loadingCourses()) {
-                <option disabled>Loading...</option>
-            } @else if (coursesError()) {
-                <option disabled>{{ coursesError() }}</option>
-            } @else {
-                @for (course of golfCourses(); track course.id) {
-                    <option [value]="course.id">{{ course.name }}</option>
-                }
+      <!-- Golf course -->
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Golf course</mat-label>
+        <mat-select formControlName="golfCourseId">
+          @if (loadingCourses()) {
+            <mat-option disabled>Loading courses…</mat-option>
+          } @else if (coursesError()) {
+            <mat-option disabled>{{ coursesError() }}</mat-option>
+          } @else {
+            @for (course of golfCourses(); track course.id) {
+              <mat-option [value]="course.id">{{ course.name }}</mat-option>
             }
-        </select>
+          }
+        </mat-select>
         @if (golfCourseId.hasError('required')) {
-            <mat-error>Golf course is required</mat-error>
+          <mat-error>Golf course is required</mat-error>
         }
-    </mat-form-field>
+      </mat-form-field>
 
-    <div class="npd-form-link">
-        <a [routerLink]="'/create-golf-course'">
-            <mat-icon>add</mat-icon>
-            Create a new golf course</a>
-    </div>
+      <a [routerLink]="['/create-golf-course']" class="create-course-link">
+        <mat-icon>add</mat-icon>
+        Create a new golf course
+      </a>
 
-    <div class="npd-form-actions">
-        <button mat-raised-button color="primary" type="submit" [disabled]="form.invalid">Create Match</button>
-    </div>
-</form>
+      <mat-divider></mat-divider>
+
+      <!-- Friends / Players -->
+      <div class="section-label">
+        <mat-icon aria-hidden="true">group</mat-icon>
+        <span>Invite friends</span>
+      </div>
+
+      @if (loadingFriends()) {
+        <div class="friends-loading">
+          <mat-progress-spinner mode="indeterminate" diameter="24"></mat-progress-spinner>
+          <span>Loading friends…</span>
+        </div>
+      } @else if (friends().length === 0) {
+        <p class="no-friends">No friends found. Add friends in your locker room to invite them to matches.</p>
+      } @else {
+        <div class="friends-list" role="group" aria-label="Select friends to invite">
+          @for (friend of friends(); track friend.userId) {
+            <mat-checkbox
+              [value]="friend.userId"
+              [checked]="players.value.includes(friend.userId)"
+              (change)="$event.checked ? players.setValue([...players.value, friend.userId]) : players.setValue(players.value.filter(id => id !== friend.userId))"
+            >
+              <span class="friend-name">{{ friend.displayName }}</span>
+            </mat-checkbox>
+          }
+        </div>
+      }
+
+      @if (submitError()) {
+        <p class="submit-error" role="alert">{{ submitError() }}</p>
+      }
+
+      <div class="form-actions">
+        <button
+          mat-raised-button
+          color="primary"
+          type="submit"
+          [disabled]="form.invalid || submitting()"
+        >
+          @if (submitting()) {
+            <mat-progress-spinner mode="indeterminate" diameter="18" class="btn-spinner"></mat-progress-spinner>
+          }
+          Create Match
+        </button>
+      </div>
+
+    </form>
+  </mat-card-content>
+</mat-card>

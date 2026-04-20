@@ -8,108 +8,57 @@
   <p class="sc-error" role="alert">{{ error() }}</p>
   } @else if (scorecard()) {
 
-  <div class="sc-header">
-    <a [routerLink]="['/play-match', scorecard()!.matchId]" class="sc-back" aria-label="Back to match">
-      <mat-icon>arrow_back</mat-icon>
-      <span>Match</span>
-    </a>
+  <a [routerLink]="['/play-match', scorecard()!.matchId]" class="sc-back" aria-label="Back to match">
+    <mat-icon>arrow_back</mat-icon>
+    <span>Back to Match</span>
+  </a>
 
-    <div [class]="'sc-total-badge ' + scoreRel(totalStrokes(), totalPar())" aria-live="polite"
-      [attr.aria-label]="'Total score: ' + totalScoreStr() + ', ' + totalStrokes() + ' strokes'">
-      <span class="sc-total-label">Total</span>
-      <span class="sc-total-value">{{ totalScoreStr() }}</span>
-      <span class="sc-total-strokes">{{ totalStrokes() }} / {{ totalPar() }}</span>
-    </div>
+  <div class="sc-top-row">
 
-    @if (saving()) {
-    <mat-progress-spinner mode="indeterminate" diameter="18" class="sc-saving-spinner"
-      aria-label="Saving..."></mat-progress-spinner>
-    }
-  </div>
-
-  <!-- Front 9 -->
-  <mat-card class="sc-nine-card">
-    <mat-card-header>
-      <mat-card-title>Front 9</mat-card-title>
-      <div class="nine-summary" aria-label="Front 9 summary">
-        <span class="nine-par">Par {{ front9Par() }}</span>
-        <span class="nine-strokes">{{ front9Strokes() }}</span>
-        <span [class]="'nine-diff ' + scoreRel(front9Strokes(), front9Par())">
-          {{ formatDiff(front9Diff()) }}
-        </span>
-      </div>
-    </mat-card-header>
+  <mat-card class="sc-detail-card" aria-live="polite"
+    [attr.aria-label]="'Total score: ' + totalScoreStr() + ', ' + totalStrokes() + ' strokes'">
     <mat-card-content>
-      <div class="hole-list" role="list" aria-label="Front 9 holes">
-        @for (hole of front9(); track hole.key) {
-        <div class="hole-row" role="listitem">
-          <span class="hole-num" aria-hidden="true">{{ hole.num }}</span>
-          <span class="hole-par">Par&nbsp;{{ hole.par }}</span>
-          <div class="stroke-stepper" role="group" [attr.aria-label]="'Hole ' + hole.num + ' strokes'">
-            <button mat-icon-button class="step-btn" (click)="decrement(hole.key)"
-              [disabled]="!canEdit() || hole.strokes <= 1"
-              [attr.aria-label]="'Hole ' + hole.num + ': decrease strokes'">
-              <mat-icon>remove</mat-icon>
-            </button>
-            <span class="stroke-val" aria-live="polite">{{ hole.strokes }}</span>
-            <button mat-icon-button class="step-btn" (click)="increment(hole.key)" [disabled]="!canEdit()"
-              [attr.aria-label]="'Hole ' + hole.num + ': increase strokes'">
-              <mat-icon>add</mat-icon>
-            </button>
-          </div>
-          <span [class]="'score-badge ' + scoreRel(hole.strokes, hole.par)"
-            [attr.aria-label]="'Score: ' + formatDiff(hole.strokes - hole.par)">
-            {{ formatDiff(hole.strokes - hole.par) }}
+      <div class="sc-detail-top">
+        <div class="sc-detail-score-block">
+          <span [class]="'sc-detail-score-value ' + scoreRel(totalStrokes(), totalPar())">
+            {{ totalScoreStr() }}
           </span>
+          <span class="sc-detail-score-sub">{{ totalStrokes() }} / {{ totalPar() }}</span>
         </div>
-        @if (!$last) {
-        <mat-divider></mat-divider>
-        }
-        }
-      </div>
-    </mat-card-content>
-  </mat-card>
 
-  <!-- Back 9 -->
-  <mat-card class="sc-nine-card">
-    <mat-card-header>
-      <mat-card-title>Back 9</mat-card-title>
-      <div class="nine-summary" aria-label="Back 9 summary">
-        <span class="nine-par">Par {{ back9Par() }}</span>
-        <span class="nine-strokes">{{ back9Strokes() }}</span>
-        <span [class]="'nine-diff ' + scoreRel(back9Strokes(), back9Par())">
-          {{ formatDiff(back9Diff()) }}
-        </span>
-      </div>
-    </mat-card-header>
-    <mat-card-content>
-      <div class="hole-list" role="list" aria-label="Back 9 holes">
-        @for (hole of back9(); track hole.key) {
-        <div class="hole-row" role="listitem">
-          <span class="hole-num" aria-hidden="true">{{ hole.num }}</span>
-          <span class="hole-par">Par&nbsp;{{ hole.par }}</span>
-          <div class="stroke-stepper" role="group" [attr.aria-label]="'Hole ' + hole.num + ' strokes'">
-            <button mat-icon-button class="step-btn" (click)="decrement(hole.key)"
-              [disabled]="!canEdit() || hole.strokes <= 1"
-              [attr.aria-label]="'Hole ' + hole.num + ': decrease strokes'">
-              <mat-icon>remove</mat-icon>
-            </button>
-            <span class="stroke-val" aria-live="polite">{{ hole.strokes }}</span>
-            <button mat-icon-button class="step-btn" (click)="increment(hole.key)" [disabled]="!canEdit()"
-              [attr.aria-label]="'Hole ' + hole.num + ': increase strokes'">
-              <mat-icon>add</mat-icon>
-            </button>
+        <div class="sc-detail-top-right">
+          @if (matchDetails().place !== null) {
+            <a
+              class="sc-place-badge"
+              [routerLink]="['/play-match', scorecard()!.matchId]"
+              [class.place-gold]="matchDetails().place === 1"
+              [class.place-silver]="matchDetails().place === 2"
+              [class.place-bronze]="matchDetails().place === 3"
+              [attr.aria-label]="'Place ' + matchDetails().place + ' in match — back to match'"
+            >{{ matchDetails().place }}</a>
+          }
+          <div class="sc-saving-row" [style.visibility]="saving() ? 'visible' : 'hidden'" aria-live="polite" [attr.aria-label]="saving() ? 'Saving...' : null">
+            <mat-progress-spinner mode="indeterminate" diameter="16"></mat-progress-spinner>
+            <span class="sc-saving-label">Saving…</span>
           </div>
-          <span [class]="'score-badge ' + scoreRel(hole.strokes, hole.par)"
-            [attr.aria-label]="'Score: ' + formatDiff(hole.strokes - hole.par)">
-            {{ formatDiff(hole.strokes - hole.par) }}
-          </span>
         </div>
-        @if (!$last) {
-        <mat-divider></mat-divider>
+      </div>
+
+      <div class="sc-detail-meta">
+        @if (matchDetails().userName) {
+          <div class="sc-detail-row">
+            <mat-icon aria-hidden="true">person</mat-icon>
+            <span>{{ matchDetails().userName }}</span>
+          </div>
         }
+        @if (matchDetails().courseName) {
+          <div class="sc-detail-row">
+            <mat-icon aria-hidden="true">golf_course</mat-icon>
+            <span>{{ matchDetails().courseName }}</span>
+          </div>
         }
       </div>
+
     </mat-card-content>
   </mat-card>
 
@@ -144,6 +93,106 @@
       </div>
     </mat-card-content>
   </mat-card>
+
+  </div><!-- /.sc-top-row -->
+
+  <div class="sc-nines-row">
+
+  <!-- Front 9 -->
+  <mat-card class="sc-nine-card">
+    <mat-card-header>
+      <mat-card-title>Front 9</mat-card-title>
+      <div class="nine-summary" aria-label="Front 9 summary">
+        <span class="nine-par">Par {{ front9Par() }}</span>
+        <span class="nine-strokes">{{ front9Strokes() }}</span>
+        <span [class]="'nine-diff ' + scoreRel(front9Strokes(), front9Par())">
+          {{ formatDiff(front9Diff()) }}
+        </span>
+      </div>
+    </mat-card-header>
+    <mat-card-content>
+      <div class="hole-list" role="list" aria-label="Front 9 holes">
+        @for (hole of front9(); track hole.key) {
+        <div class="hole-row" role="listitem">
+          <span class="hole-num" aria-hidden="true">{{ hole.num }}</span>
+          <span class="hole-par">Par&nbsp;{{ hole.par }}</span>
+          <div class="stroke-stepper" role="group" [attr.aria-label]="'Hole ' + hole.num + ' strokes'">
+            @if (canEdit()) {
+              <button mat-icon-button class="step-btn" (click)="decrement(hole.key)"
+                [disabled]="hole.strokes <= 1"
+                [attr.aria-label]="'Hole ' + hole.num + ': decrease strokes'">
+                <mat-icon>remove</mat-icon>
+              </button>
+            }
+            <span class="stroke-val" aria-live="polite">{{ hole.strokes }}</span>
+            @if (canEdit()) {
+              <button mat-icon-button class="step-btn" (click)="increment(hole.key)"
+                [attr.aria-label]="'Hole ' + hole.num + ': increase strokes'">
+                <mat-icon>add</mat-icon>
+              </button>
+            }
+          </div>
+          <span [class]="'score-badge ' + scoreRel(hole.strokes, hole.par)"
+            [attr.aria-label]="'Score: ' + formatDiff(hole.strokes - hole.par)">
+            {{ formatDiff(hole.strokes - hole.par) }}
+          </span>
+        </div>
+        @if (!$last) {
+        <mat-divider></mat-divider>
+        }
+        }
+      </div>
+    </mat-card-content>
+  </mat-card>
+
+  <!-- Back 9 -->
+  <mat-card class="sc-nine-card">
+    <mat-card-header>
+      <mat-card-title>Back 9</mat-card-title>
+      <div class="nine-summary" aria-label="Back 9 summary">
+        <span class="nine-par">Par {{ back9Par() }}</span>
+        <span class="nine-strokes">{{ back9Strokes() }}</span>
+        <span [class]="'nine-diff ' + scoreRel(back9Strokes(), back9Par())">
+          {{ formatDiff(back9Diff()) }}
+        </span>
+      </div>
+    </mat-card-header>
+    <mat-card-content>
+      <div class="hole-list" role="list" aria-label="Back 9 holes">
+        @for (hole of back9(); track hole.key) {
+        <div class="hole-row" role="listitem">
+          <span class="hole-num" aria-hidden="true">{{ hole.num }}</span>
+          <span class="hole-par">Par&nbsp;{{ hole.par }}</span>
+          <div class="stroke-stepper" role="group" [attr.aria-label]="'Hole ' + hole.num + ' strokes'">
+            @if (canEdit()) {
+              <button mat-icon-button class="step-btn" (click)="decrement(hole.key)"
+                [disabled]="hole.strokes <= 1"
+                [attr.aria-label]="'Hole ' + hole.num + ': decrease strokes'">
+                <mat-icon>remove</mat-icon>
+              </button>
+            }
+            <span class="stroke-val" aria-live="polite">{{ hole.strokes }}</span>
+            @if (canEdit()) {
+              <button mat-icon-button class="step-btn" (click)="increment(hole.key)"
+                [attr.aria-label]="'Hole ' + hole.num + ': increase strokes'">
+                <mat-icon>add</mat-icon>
+              </button>
+            }
+          </div>
+          <span [class]="'score-badge ' + scoreRel(hole.strokes, hole.par)"
+            [attr.aria-label]="'Score: ' + formatDiff(hole.strokes - hole.par)">
+            {{ formatDiff(hole.strokes - hole.par) }}
+          </span>
+        </div>
+        @if (!$last) {
+        <mat-divider></mat-divider>
+        }
+        }
+      </div>
+    </mat-card-content>
+  </mat-card>
+
+  </div><!-- /.sc-nines-row -->
 
   }
 </div>

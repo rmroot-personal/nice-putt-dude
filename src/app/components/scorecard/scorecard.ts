@@ -1,13 +1,16 @@
 import { ChangeDetectionStrategy, Component, OnDestroy, computed, inject, signal } from '@angular/core';
+import { toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, RouterLink } from '@angular/router';
-import { Subject, Subscription } from 'rxjs';
-import { debounceTime } from 'rxjs/operators';
+import { Subject, Subscription, combineLatest, from, of } from 'rxjs';
+import { debounceTime, map, startWith, switchMap } from 'rxjs/operators';
 import { MatCard, MatCardContent, MatCardHeader, MatCardTitle } from '@angular/material/card';
 import { MatIconButton } from '@angular/material/button';
 import { MatIcon } from '@angular/material/icon';
 import { MatProgressSpinner } from '@angular/material/progress-spinner';
 import { MatDivider } from '@angular/material/list';
 import { ScorecardFirestoreService } from '../../services/scorecard-firestore.service';
+import { GolfCoursesFirestoreService } from '../../services/golf-courses-firestore.service';
+import { ScoreboardsFirestoreService } from '../../services/scoreboards-firestore.service';
 import { EighteenHoles, IScorecard } from '../../models/scorecard.model';
 import { UserService } from '../../services/user.service';
 
@@ -18,6 +21,12 @@ interface HoleRow {
   num: number;
   par: number;
   strokes: number;
+}
+
+interface MatchDetails {
+  place: number | null;
+  courseName: string | null;
+  userName: string | null;
 }
 
 @Component({
@@ -40,12 +49,36 @@ interface HoleRow {
 export class Scorecard implements OnDestroy {
   private readonly route = inject(ActivatedRoute);
   private readonly scorecardService = inject(ScorecardFirestoreService);
+  private readonly golfCoursesService = inject(GolfCoursesFirestoreService);
+  private readonly scoreboardsService = inject(ScoreboardsFirestoreService);
   private readonly userService = inject(UserService);
 
   readonly scorecard = signal<IScorecard | null>(null);
   readonly loading = signal(true);
   readonly error = signal<string | null>(null);
   readonly saving = signal(false);
+
+  readonly matchDetails = toSignal(
+    toObservable(this.scorecard).pipe(
+      switchMap(sc => {
+        if (!sc) return of({ place: null, courseName: null, userName: null } as MatchDetails);
+        return combineLatest([
+          this.scoreboardsService.getScoreboard$(sc.matchId).pipe(startWith(null)),
+          from(this.golfCoursesService.getGolfCourseById(sc.courseId)),
+        ]).pipe(
+          map(([scoreboard, course]) => {
+            const entry = scoreboard?.entries?.find(e => e.userId === sc.userId) ?? null;
+            return {
+              place: entry?.place ?? null,
+              courseName: course?.name ?? null,
+              userName: entry?.userDisplayName ?? this.userService.user()?.displayName ?? null,
+            } as MatchDetails;
+          }),
+        );
+      }),
+    ),
+    { initialValue: { place: null, courseName: null, userName: null } as MatchDetails },
+  );
 
   readonly canEdit = computed(() => {
     const sc = this.scorecard();
