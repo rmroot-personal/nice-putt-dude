@@ -1,13 +1,14 @@
+@let _user = user();
 <mat-toolbar color="primary" class="npd-toolbar">
 	<mat-icon>sports_golf</mat-icon>
 	<a [routerLink]="['/']" class="npd-title npd-title-link">
 		Nice Putt Dude
 	</a>
 	<span class="npd-toolbar-spacer"></span>
-	@if (user()) {
+	@if (_user) {
 	<button mat-icon-button [matMenuTriggerFor]="userMenu" class="npd-avatar-btn" aria-label="User menu">
-		@if (user()?.photoURL) {
-		<img [src]="user()!.photoURL" class="npd-avatar" alt="User avatar" />
+		@if (_user?.photoURL) {
+		<img [src]="_user!.photoURL" class="npd-avatar" alt="User avatar" />
 		} @else {
 		<mat-icon class="icon-white">account_circle</mat-icon>
 		}

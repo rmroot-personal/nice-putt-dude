@@ -1,4 +1,8 @@
-@if (user()) {
+@let _match = match();
+@let _scoreboard = scoreboard();
+@let _user = user();
+
+@if (_user) {
 <a [routerLink]="['/my-matches']" class="sc-back" aria-label="Back to my matches">
   <mat-icon>arrow_back</mat-icon>
   <span>Back to My Matches</span>
@@ -8,16 +12,16 @@
   <mat-card-header>
     <mat-card-title>
       <mat-icon>golf_course</mat-icon>
-      {{ match()?.name }}
+      {{ _match?.name }}
     </mat-card-title>
-    @if (match()?.createdByUserId === user()?.uid) {
-    <a [routerLink]="['/edit-match', match()?.id]" class="settings-link" aria-label="Match settings">
+    @if (_match?.createdByUserId === _user?.uid) {
+    <a [routerLink]="['/edit-match', _match?.id]" class="settings-link" aria-label="Match settings">
       <mat-icon>settings</mat-icon>
     </a>
     }
   </mat-card-header>
 
-  @if (user() && !userHasScorecard()) {
+  @if (_user && !userHasScorecard()) {
   <div class="add-scorecard-row">
     <button mat-raised-button color="primary" type="button" (click)="addUserScorecard()"
       [disabled]="addingScorecard()">
@@ -39,18 +43,18 @@
     </div>
     } @else if (error()) {
     <mat-error>{{ error() }}</mat-error>
-    } @else if (match()) {
+    } @else if (_match) {
 
     <div class="leaderboard-header">
       <mat-icon>leaderboard</mat-icon>
       <span>Leaderboard</span>
     </div>
 
-    @if (!scoreboard()?.entries?.length) {
+    @if (!_scoreboard?.entries?.length) {
     <p class="no-entries">No scorecards found for this match yet....</p>
     } @else {
     <div class="leaderboard" role="list">
-      @for (entry of scoreboard()?.entries; track entry.scorecardId; let index = $index) {
+      @for (entry of _scoreboard?.entries; track entry.scorecardId; let index = $index) {
       <a class="leaderboard-row" [routerLink]="['/scorecard', entry.scorecardId]" role="listitem"
         [attr.aria-label]="'View scorecard for ' + entry.userDisplayName + ', place ' + entry.place + ', score ' + entry.score">
         <span class="place-badge" [class.place-gold]="entry.place === 1" [class.place-silver]="entry.place === 2"
@@ -67,7 +71,7 @@
 
         <mat-icon class="row-chevron" aria-hidden="true">chevron_right</mat-icon>
       </a>
-      @if (index < (scoreboard()?.entries?.length ?? 0) - 1) { <mat-divider></mat-divider>
+      @if (index < (_scoreboard?.entries?.length ?? 0) - 1) { <mat-divider></mat-divider>
         }
         }
     </div>

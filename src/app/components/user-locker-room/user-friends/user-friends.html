@@ -1,15 +1,14 @@
+@let _friends = friends();
 <mat-card-content>
     @if (loading()) {
     <div class="npd-spinner-container">
         <mat-progress-spinner mode="indeterminate" diameter="36"></mat-progress-spinner>
     </div>
-    } @else if (hasError()) {
-    <mat-error>Failed to load friends</mat-error>
-    } @else if (friends().length === 0) {
+    } @else if (_friends.length === 0) {
     <p>No friends yet.</p>
     } @else {
     <mat-nav-list>
-        @for (friend of friends(); track friend.friendship.id) {
+        @for (friend of _friends; track friend.friendship.id) {
         <a mat-list-item [routerLink]="['/profile', friend.userId]" class="npd-friend-link">
             <mat-icon>person</mat-icon>
             {{ friend.displayName }}

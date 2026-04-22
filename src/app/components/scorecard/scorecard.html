@@ -1,3 +1,20 @@
+@let _scorecard = scorecard();
+@let _totalScore = totalScoreStr();
+@let _matchDetails = matchDetails();
+@let _totalStrokes = totalStrokes();
+@let _totalPar = totalPar();
+@let _front9 = front9();
+@let _back9 = back9();
+@let _front9Strokes = front9Strokes();
+@let _front9Par = front9Par();
+@let _back9Strokes = back9Strokes();
+@let _back9Par = back9Par();
+@let _saving = saving();
+@let _canEdit = canEdit();
+@let _front9Diff = front9Diff();
+@let _back9Diff = back9Diff();
+
+
 <div class="sc-page">
   @if (loading()) {
   <div class="sc-loading">
@@ -6,9 +23,9 @@
   </div>
   } @else if (error()) {
   <p class="sc-error" role="alert">{{ error() }}</p>
-  } @else if (scorecard()) {
+  } @else if (_scorecard) {
 
-  <a [routerLink]="['/play-match', scorecard()!.matchId]" class="sc-back" aria-label="Back to match">
+  <a [routerLink]="['/play-match', _scorecard!.matchId]" class="sc-back" aria-label="Back to match">
     <mat-icon>arrow_back</mat-icon>
     <span>Back to Match</span>
   </a>
@@ -16,28 +33,28 @@
   <div class="sc-top-row">
 
   <mat-card class="sc-detail-card" aria-live="polite"
-    [attr.aria-label]="'Total score: ' + totalScoreStr() + ', ' + totalStrokes() + ' strokes'">
+    [attr.aria-label]="'Total score: ' + _totalScore + ', ' + _totalStrokes + ' strokes'">
     <mat-card-content>
       <div class="sc-detail-top">
         <div class="sc-detail-score-block">
-          <span [class]="'sc-detail-score-value ' + scoreRel(totalStrokes(), totalPar())">
-            {{ totalScoreStr() }}
+          <span [class]="'sc-detail-score-value ' + scoreRel(_totalStrokes, _totalPar)">
+            {{ _totalScore }}
           </span>
-          <span class="sc-detail-score-sub">{{ totalStrokes() }} / {{ totalPar() }}</span>
+          <span class="sc-detail-score-sub">{{ _totalStrokes }} / {{ _totalPar }}</span>
         </div>
 
         <div class="sc-detail-top-right">
-          @if (matchDetails().place !== null) {
+          @if (_matchDetails.place !== null) {
             <a
               class="sc-place-badge"
-              [routerLink]="['/play-match', scorecard()!.matchId]"
-              [class.place-gold]="matchDetails().place === 1"
-              [class.place-silver]="matchDetails().place === 2"
-              [class.place-bronze]="matchDetails().place === 3"
-              [attr.aria-label]="'Place ' + matchDetails().place + ' in match — back to match'"
-            >{{ matchDetails().place }}</a>
+              [routerLink]="['/play-match', _scorecard!.matchId]"
+              [class.place-gold]="_matchDetails.place === 1"
+              [class.place-silver]="_matchDetails.place === 2"
+              [class.place-bronze]="_matchDetails.place === 3"
+              [attr.aria-label]="'Place ' + _matchDetails.place + ' in match — back to match'"
+            >{{ _matchDetails.place }}</a>
           }
-          <div class="sc-saving-row" [style.visibility]="saving() ? 'visible' : 'hidden'" aria-live="polite" [attr.aria-label]="saving() ? 'Saving...' : null">
+          <div class="sc-saving-row" [style.visibility]="_saving ? 'visible' : 'hidden'" aria-live="polite" [attr.aria-label]="_saving ? 'Saving...' : null">
             <mat-progress-spinner mode="indeterminate" diameter="16"></mat-progress-spinner>
             <span class="sc-saving-label">Saving…</span>
           </div>
@@ -45,16 +62,16 @@
       </div>
 
       <div class="sc-detail-meta">
-        @if (matchDetails().userName) {
+        @if (_matchDetails.userName) {
           <div class="sc-detail-row">
             <mat-icon aria-hidden="true">person</mat-icon>
-            <span>{{ matchDetails().userName }}</span>
+            <span>{{ _matchDetails.userName }}</span>
           </div>
         }
-        @if (matchDetails().courseName) {
+        @if (_matchDetails.courseName) {
           <div class="sc-detail-row">
             <mat-icon aria-hidden="true">golf_course</mat-icon>
-            <span>{{ matchDetails().courseName }}</span>
+            <span>{{ _matchDetails.courseName }}</span>
           </div>
         }
       </div>
@@ -67,28 +84,28 @@
     <mat-card-content>
       <div class="summary-row" role="row">
         <span class="summary-label">Out</span>
-        <span class="summary-strokes">{{ front9Strokes() }}</span>
-        <span class="summary-par">/ {{ front9Par() }}</span>
-        <span [class]="'summary-diff ' + scoreRel(front9Strokes(), front9Par())">
-          {{ formatDiff(front9Diff()) }}
+        <span class="summary-strokes">{{ _front9Strokes }}</span>
+        <span class="summary-par">/ {{ _front9Par }}</span>
+        <span [class]="'summary-diff ' + scoreRel(_front9Strokes, _front9Par)">
+          {{ formatDiff(_front9Diff) }}
         </span>
       </div>
       <mat-divider></mat-divider>
       <div class="summary-row" role="row">
         <span class="summary-label">In</span>
-        <span class="summary-strokes">{{ back9Strokes() }}</span>
-        <span class="summary-par">/ {{ back9Par() }}</span>
-        <span [class]="'summary-diff ' + scoreRel(back9Strokes(), back9Par())">
-          {{ formatDiff(back9Diff()) }}
+        <span class="summary-strokes">{{ _back9Strokes }}</span>
+        <span class="summary-par">/ {{ _back9Par }}</span>
+        <span [class]="'summary-diff ' + scoreRel(_back9Strokes, _back9Par)">
+          {{ formatDiff(_back9Diff) }}
         </span>
       </div>
       <mat-divider></mat-divider>
       <div class="summary-row summary-total" role="row">
         <span class="summary-label">Total</span>
-        <span class="summary-strokes">{{ totalStrokes() }}</span>
-        <span class="summary-par">/ {{ totalPar() }}</span>
-        <span [class]="'summary-diff ' + scoreRel(totalStrokes(), totalPar())">
-          {{ totalScoreStr() }}
+        <span class="summary-strokes">{{ _totalStrokes }}</span>
+        <span class="summary-par">/ {{ _totalPar }}</span>
+        <span [class]="'summary-diff ' + scoreRel(_totalStrokes, _totalPar)">
+          {{ _totalScore }}
         </span>
       </div>
     </mat-card-content>
@@ -103,21 +120,21 @@
     <mat-card-header>
       <mat-card-title>Front 9</mat-card-title>
       <div class="nine-summary" aria-label="Front 9 summary">
-        <span class="nine-par">Par {{ front9Par() }}</span>
-        <span class="nine-strokes">{{ front9Strokes() }}</span>
-        <span [class]="'nine-diff ' + scoreRel(front9Strokes(), front9Par())">
-          {{ formatDiff(front9Diff()) }}
+        <span class="nine-par">Par {{ _front9Par }}</span>
+        <span class="nine-strokes">{{ _front9Strokes }}</span>
+        <span [class]="'nine-diff ' + scoreRel(_front9Strokes, _front9Par)">
+          {{ formatDiff(_front9Diff) }}
         </span>
       </div>
     </mat-card-header>
     <mat-card-content>
       <div class="hole-list" role="list" aria-label="Front 9 holes">
-        @for (hole of front9(); track hole.key) {
+        @for (hole of _front9; track hole.key) {
         <div class="hole-row" role="listitem">
           <span class="hole-num" aria-hidden="true">{{ hole.num }}</span>
           <span class="hole-par">Par&nbsp;{{ hole.par }}</span>
           <div class="stroke-stepper" role="group" [attr.aria-label]="'Hole ' + hole.num + ' strokes'">
-            @if (canEdit()) {
+            @if (_canEdit) {
               <button mat-icon-button class="step-btn" (click)="decrement(hole.key)"
                 [disabled]="hole.strokes <= 1"
                 [attr.aria-label]="'Hole ' + hole.num + ': decrease strokes'">
@@ -125,7 +142,7 @@
               </button>
             }
             <span class="stroke-val" aria-live="polite">{{ hole.strokes }}</span>
-            @if (canEdit()) {
+            @if (_canEdit) {
               <button mat-icon-button class="step-btn" (click)="increment(hole.key)"
                 [attr.aria-label]="'Hole ' + hole.num + ': increase strokes'">
                 <mat-icon>add</mat-icon>
@@ -150,21 +167,21 @@
     <mat-card-header>
       <mat-card-title>Back 9</mat-card-title>
       <div class="nine-summary" aria-label="Back 9 summary">
-        <span class="nine-par">Par {{ back9Par() }}</span>
-        <span class="nine-strokes">{{ back9Strokes() }}</span>
-        <span [class]="'nine-diff ' + scoreRel(back9Strokes(), back9Par())">
-          {{ formatDiff(back9Diff()) }}
+        <span class="nine-par">Par {{ _back9Par }}</span>
+        <span class="nine-strokes">{{ _back9Strokes }}</span>
+        <span [class]="'nine-diff ' + scoreRel(_back9Strokes, _back9Par)">
+          {{ formatDiff(_back9Diff) }}
         </span>
       </div>
     </mat-card-header>
     <mat-card-content>
       <div class="hole-list" role="list" aria-label="Back 9 holes">
-        @for (hole of back9(); track hole.key) {
+        @for (hole of _back9; track hole.key) {
         <div class="hole-row" role="listitem">
           <span class="hole-num" aria-hidden="true">{{ hole.num }}</span>
           <span class="hole-par">Par&nbsp;{{ hole.par }}</span>
           <div class="stroke-stepper" role="group" [attr.aria-label]="'Hole ' + hole.num + ' strokes'">
-            @if (canEdit()) {
+            @if (_canEdit) {
               <button mat-icon-button class="step-btn" (click)="decrement(hole.key)"
                 [disabled]="hole.strokes <= 1"
                 [attr.aria-label]="'Hole ' + hole.num + ': decrease strokes'">
@@ -172,7 +189,7 @@
               </button>
             }
             <span class="stroke-val" aria-live="polite">{{ hole.strokes }}</span>
-            @if (canEdit()) {
+            @if (_canEdit) {
               <button mat-icon-button class="step-btn" (click)="increment(hole.key)"
                 [attr.aria-label]="'Hole ' + hole.num + ': increase strokes'">
                 <mat-icon>add</mat-icon>
