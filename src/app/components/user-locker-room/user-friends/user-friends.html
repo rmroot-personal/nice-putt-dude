@@ -3,26 +3,17 @@
     <div class="npd-spinner-container">
         <mat-progress-spinner mode="indeterminate" diameter="36"></mat-progress-spinner>
     </div>
-    } @else if (error()) {
-    <mat-error>{{ error() }}</mat-error>
-    } @else if (friendships().length === 0) {
-    <p>No people found.</p>
+    } @else if (hasError()) {
+    <mat-error>Failed to load friends</mat-error>
+    } @else if (friends().length === 0) {
+    <p>No friends yet.</p>
     } @else {
     <mat-nav-list>
-        @for (friendship of friendships(); track friendship.id) {
-        @if(friendship.user1Id === user()?.uid) {
-        <!--display user2's name-->
-        <a mat-list-item [routerLink]="['/profile', friendship.user2Id]" class="npd-friend-link">
-            <mat-icon>emoji_people</mat-icon>
-            {{ friendNames()[friendship.user2Id] }}
+        @for (friend of friends(); track friend.friendship.id) {
+        <a mat-list-item [routerLink]="['/profile', friend.userId]" class="npd-friend-link">
+            <mat-icon>person</mat-icon>
+            {{ friend.displayName }}
         </a>
-        }@else {
-        <!--display user1's name-->
-        <a mat-list-item [routerLink]="['/profile', friendship.user1Id]" class="npd-friend-link">
-            <mat-icon>emoji_people</mat-icon>
-            {{ friendNames()[friendship.user1Id] }}
-        </a>
-        }
         }
     </mat-nav-list>
     }

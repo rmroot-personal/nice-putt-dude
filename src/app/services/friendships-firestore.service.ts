@@ -1,6 +1,7 @@
 
 import { Injectable, inject } from '@angular/core';
-import { Firestore, collection, addDoc, CollectionReference, DocumentData, doc, getDoc, query, where, getDocs } from '@angular/fire/firestore';
+import { Firestore, collection, addDoc, doc, getDoc, query, where, getDocs, onSnapshot } from '@angular/fire/firestore';
+import { Observable } from 'rxjs';
 import { IFriendship } from '../models/friendship.model';
 import { UserService } from './user.service';
 import { or } from 'firebase/firestore';
@@ -41,6 +42,31 @@ export class FriendshipsFirestoreService {
 		return snap.docs.map(docSnap => {
 			const data = docSnap.data() as IFriendship;
 			return { id: docSnap.id, user1Id: data.user1Id, user2Id: data.user2Id };
+		});
+	}
+
+	/**
+	 * Returns a real-time observable of friendships for the current user.
+	 */
+	userFriendships$(): Observable<IFriendship[]> {
+		const user = this.userService.user();
+		if (!user) return new Observable<IFriendship[]>(subscriber => subscriber.next([]));
+		const friendshipsRef = collection(this.firestore, 'friendships');
+		const q = query(friendshipsRef, or(
+			where('user1Id', '==', user.uid),
+			where('user2Id', '==', user.uid)
+		));
+		return new Observable<IFriendship[]>(subscriber => {
+			const unsubscribe = onSnapshot(q, snapshot => {
+				const friendships = snapshot.docs.map(docSnap => {
+					const data = docSnap.data() as IFriendship;
+					return { id: docSnap.id, user1Id: data.user1Id, user2Id: data.user2Id };
+				});
+				subscriber.next(friendships);
+			}, error => {
+				subscriber.error(error);
+			});
+			return () => unsubscribe();
 		});
 	}
 }

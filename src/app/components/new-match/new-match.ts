@@ -1,6 +1,9 @@
-import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
+import { toSignal } from '@angular/core/rxjs-interop';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
+import { combineLatest, of } from 'rxjs';
+import { catchError, map } from 'rxjs/operators';
 import { MatCard, MatCardContent, MatCardHeader, MatCardTitle } from '@angular/material/card';
 import { MatFormField, MatLabel, MatError, MatHint } from '@angular/material/form-field';
 import { MatInput } from '@angular/material/input';
@@ -68,8 +71,27 @@ export class NewMatch {
   readonly loadingCourses = signal(true);
   readonly coursesError = signal<string | null>(null);
 
-  readonly friends = signal<IPublicUser[]>([]);
-  readonly loadingFriends = signal(true);
+  private readonly friendItems = toSignal<IPublicUser[] | null>(
+    combineLatest([
+      this.friendshipsService.userFriendships$(),
+      this.publicUsersService.publicUsers$(),
+    ]).pipe(
+      map(([friendships, publicUsers]) => {
+        const userId = this.userService.user()?.uid;
+        if (!userId) return [];
+        return friendships
+          .map(f => {
+            const friendId = f.user1Id === userId ? f.user2Id : f.user1Id;
+            return publicUsers.find(u => u.userId === friendId) ?? null;
+          })
+          .filter((u): u is IPublicUser => u !== null);
+      }),
+      catchError(() => of(null)),
+    )
+  );
+
+  readonly loadingFriends = computed(() => this.friendItems() === undefined);
+  readonly friends = computed(() => this.friendItems() ?? []);
 
   readonly submitting = signal(false);
   readonly submitError = signal<string | null>(null);
@@ -84,32 +106,6 @@ export class NewMatch {
         this.coursesError.set('Failed to load golf courses');
         this.loadingCourses.set(false);
       });
-
-    this.loadFriends();
-  }
-
-  private async loadFriends(): Promise<void> {
-    const user = this.userService.user();
-    if (!user) {
-      this.loadingFriends.set(false);
-      return;
-    }
-    try {
-      const friendships = await this.friendshipsService.getFriendshipsForCurrentUser();
-      const friendIds = friendships.map(f =>
-        f.user1Id === user.uid ? f.user2Id : f.user1Id
-      );
-      if (friendIds.length === 0) {
-        this.loadingFriends.set(false);
-        return;
-      }
-      const publicUsers = await Promise.all(
-        friendIds.map(id => this.publicUsersService.getPublicUserByUserId(id))
-      );
-      this.friends.set(publicUsers.filter((u): u is IPublicUser => u !== null));
-    } finally {
-      this.loadingFriends.set(false);
-    }
   }
 
   async onSubmit(): Promise<void> {

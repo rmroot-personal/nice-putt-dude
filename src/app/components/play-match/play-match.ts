@@ -42,33 +42,21 @@ export class PlayMatch {
   private readonly scoreboardsService = inject(ScoreboardsFirestoreService);
   private readonly router = inject(Router);
 
-  readonly match$ = signal<IMatch | null>(null);
-  get match() {
-    return this.match$();
-  }
-  readonly loadingMatch$ = signal(true);
-  readonly loadingScorecards$ = signal(true);
-  readonly addingScorecard$ = signal(false);
+  readonly match = signal<IMatch | null>(null);
+  readonly loadingMatch = signal(true);
+  readonly loadingScorecards = signal(true);
+  readonly addingScorecard = signal(false);
   get loading() {
-    return this.loadingMatch$() || this.loadingScorecards$();
+    return this.loadingMatch() || this.loadingScorecards();
   }
-  readonly error$ = signal<string | null>(null);
-  get error() {
-    return this.error$();
-  }
-  readonly scoreboard$ = signal<IScoreboard | null>(null);
-  get scoreboard() {
-    return this.scoreboard$();
-  }
-  readonly user$ = computed(() => this.userService.user());
-  get user() {
-    return this.user$();
-  }
+  readonly error = signal<string | null>(null);
+  readonly scoreboard = signal<IScoreboard | null>(null);
+  readonly user = computed(() => this.userService.user());
   readonly userHasScorecard = computed(() => {
-    const user = this.user;
+    const user = this.user();
     if (!user) return false;
-    console.log(this.scoreboard)
-    return this.scoreboard?.entries.some(entry => entry.userId === user.uid) ?? false;
+    console.log(this.scoreboard())
+    return this.scoreboard()?.entries.some(entry => entry.userId === user.uid) ?? false;
   });
 
   constructor() {
@@ -77,12 +65,12 @@ export class PlayMatch {
       effect(() => {
         const sub = this.matchesService.match$(id).subscribe({
           next: match => {
-            this.match$.set(match);
-            this.loadingMatch$.set(false);
+            this.match.set(match);
+            this.loadingMatch.set(false);
           },
           error: err => {
-            this.error$.set('Could not load match');
-            this.loadingMatch$.set(false);
+            this.error.set('Could not load match');
+            this.loadingMatch.set(false);
           }
         });
         return () => sub.unsubscribe();
@@ -93,43 +81,43 @@ export class PlayMatch {
       effect(() => {
         const sub = this.scoreboardsService.getScoreboard$(id).subscribe({
           next: scoreboard => {
-            this.scoreboard$.set(scoreboard);
-            this.loadingScorecards$.set(false);
+            this.scoreboard.set(scoreboard);
+            this.loadingScorecards.set(false);
           },
           error: err => {
-            this.error$.set('Could not load scoreboard');
-            this.loadingScorecards$.set(false);
+            this.error.set('Could not load scoreboard');
+            this.loadingScorecards.set(false);
           }
         });
         return () => sub.unsubscribe();
       });
 
     } else {
-      this.error$.set('No match id provided');
-      this.loadingMatch$.set(false);
+      this.error.set('No match id provided');
+      this.loadingMatch.set(false);
     }
 
   }
 
 
   async addUserScorecard() {
-    const user = this.user;
-    const match = this.match;
+    const user = this.user();
+    const match = this.match();
     if (!user || !match) {
-      this.error$.set('User or match not loaded');
+      this.error.set('User or match not loaded');
       return;
     }
     const courseId = match.golfCourseId;
     if (!courseId) {
-      this.error$.set('No courseId found for this match');
+      this.error.set('No courseId found for this match');
       return;
     }
-    this.addingScorecard$.set(true);
+    this.addingScorecard.set(true);
     try {
       const course = await this.golfCoursesService.getGolfCourseById(courseId);
       if (!course) {
-        this.error$.set('Golf course not found');
-        this.addingScorecard$.set(false);
+        this.error.set('Golf course not found');
+        this.addingScorecard.set(false);
         return;
       }
       const newScorecard: Omit<IScorecard, 'id'> = {
@@ -142,15 +130,15 @@ export class PlayMatch {
       const newScorecardId = await this.scorecardService.addScorecard(newScorecard as IScorecard);
       this.router.navigate(['/scorecard', newScorecardId]);
     } catch {
-      this.error$.set('Failed to add scorecard');
-      this.addingScorecard$.set(false);
+      this.error.set('Failed to add scorecard');
+      this.addingScorecard.set(false);
     }
   }
 
   async deleteMatch() {
-    const match = this.match;
+    const match = this.match();
     if (!match) {
-      this.error$.set('Match not loaded');
+      this.error.set('Match not loaded');
       return;
     }
     await this.matchesService.deleteMatch(match.id);
