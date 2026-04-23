@@ -1,0 +1,113 @@
+erDiagram
+
+    FriendRequest {
+        string id PK
+        User fromUserId FK
+        User toUserId FK
+    }
+
+    Friendship {
+        string id PK
+        User user1Id FK
+        User user2Id FK
+    }
+
+    GolfCourse {
+        string id PK
+        string name
+        GolfHole holes FK
+    }
+
+    GolfHole {
+        int par
+    }
+
+    Match {
+        string id PK
+        string name
+        User createdByUserId FK
+        string createdAt
+        string players
+        GolfCourse golfCourseId FK
+    }
+
+    PublicUser {
+        User userId FK
+        string displayName
+    }
+
+    ScoreboardEntry {
+        string userDisplayName
+        User userId FK
+        string score
+        int place
+        string userThumbnail
+        Scorecard scorecardId FK
+    }
+
+    Scoreboard {
+        Match matchId FK
+        ScoreboardEntry entries FK
+        string updatedAt
+    }
+
+    Scorecard {
+        string id PK
+        User userId FK
+        GolfCourse courseId FK
+        Match matchId FK
+        date date
+        EighteenHoles holes FK
+    }
+
+    ScorecardHole {
+        int strokes
+    }
+
+    EighteenHoles {
+        ScorecardHole hole1 FK
+        ScorecardHole hole2 FK
+        ScorecardHole hole3 FK
+        ScorecardHole hole4 FK
+        ScorecardHole hole5 FK
+        ScorecardHole hole6 FK
+        ScorecardHole hole7 FK
+        ScorecardHole hole8 FK
+        ScorecardHole hole9 FK
+        ScorecardHole hole10 FK
+        ScorecardHole hole11 FK
+        ScorecardHole hole12 FK
+        ScorecardHole hole13 FK
+        ScorecardHole hole14 FK
+        ScorecardHole hole15 FK
+        ScorecardHole hole16 FK
+        ScorecardHole hole17 FK
+        ScorecardHole hole18 FK
+    }
+
+    User {
+        string uid PK
+        string displayName
+        string email
+        string photoURL
+        boolean emailVerified
+    }
+
+    FriendRequest ||--|| User : "fromUserId"
+    FriendRequest ||--|| User : "toUserId"
+    Friendship ||--|| User : "user1Id"
+    Friendship ||--|| User : "user2Id"
+    GolfCourse ||--o{ GolfHole : "contains holes"
+    Match ||--|| User : "createdByUserId"
+    Match ||--|| GolfCourse : "golfCourseId"
+    PublicUser ||--|| User : "userId"
+    ScoreboardEntry ||--|| User : "userId"
+    ScoreboardEntry ||--|| Scorecard : "scorecardId"
+    Scoreboard ||--|| Match : "matchId"
+    Scoreboard ||--o{ ScoreboardEntry : "contains entries"
+    Scorecard ||--|| User : "userId"
+    Scorecard ||--|| GolfCourse : "courseId"
+    Scorecard ||--|| Match : "matchId"
+    Scorecard ||--|| EighteenHoles : "holes"
+    GolfHole ||--|| ScorecardHole : "extends"
+    EighteenHoles ||--|| ScorecardHole : "hole1"
